@@ -7,7 +7,7 @@ import { KOKTEYL_TARIFLERI } from './seed-kokteyller';
 
 // Seed verisi değiştiğinde bu sürümü artırın; uygulama açılışta
 // veritabanını yeni veriyle baştan kurar.
-const SEMA_SURUMU = 2;
+const SEMA_SURUMU = 3;
 
 export interface Mutfak {
   id: number;
@@ -30,6 +30,10 @@ export interface Tarif {
   sure_dk: number;
   adimlar: string;
   tur: 'yemek' | 'kokteyl';
+}
+
+export interface TarifMalzemesi extends Malzeme {
+  miktar: string;
 }
 
 export interface EslesenTarif extends Tarif {
@@ -69,6 +73,7 @@ export async function initDb(db: SQLiteDatabase) {
     CREATE TABLE tarif_malzeme (
       tarif_id INTEGER NOT NULL REFERENCES tarifler(id) ON DELETE CASCADE,
       malzeme_id INTEGER NOT NULL REFERENCES malzemeler(id) ON DELETE CASCADE,
+      miktar TEXT NOT NULL DEFAULT '',
       PRIMARY KEY (tarif_id, malzeme_id)
     );
   `);
@@ -118,9 +123,12 @@ async function seedYukle(db: SQLiteDatabase) {
         'INSERT INTO tarifler (isim, mutfak_id, kategori, sure_dk, adimlar, tur) VALUES (?, ?, ?, ?, ?, ?)',
         t.isim, mid, t.kategori, t.sure, t.adimlar.join('\n'), t.tur
       );
-      for (const m of t.malzemeler) {
-        const malzId = await malzemeBul(m);
-        await db.runAsync('INSERT OR IGNORE INTO tarif_malzeme (tarif_id, malzeme_id) VALUES (?, ?)', r.lastInsertRowId, malzId);
+      for (const [mIsim, miktar] of t.malzemeler) {
+        const malzId = await malzemeBul(mIsim);
+        await db.runAsync(
+          'INSERT OR IGNORE INTO tarif_malzeme (tarif_id, malzeme_id, miktar) VALUES (?, ?, ?)',
+          r.lastInsertRowId, malzId, miktar
+        );
       }
     }
   });
@@ -155,9 +163,9 @@ export async function getTarif(db: SQLiteDatabase, id: number): Promise<Tarif | 
   );
 }
 
-export async function getTarifMalzemeleri(db: SQLiteDatabase, tarifId: number): Promise<Malzeme[]> {
-  return db.getAllAsync<Malzeme>(
-    `SELECT m.id, m.isim, m.kategori FROM tarif_malzeme tm
+export async function getTarifMalzemeleri(db: SQLiteDatabase, tarifId: number): Promise<TarifMalzemesi[]> {
+  return db.getAllAsync<TarifMalzemesi>(
+    `SELECT m.id, m.isim, m.kategori, tm.miktar FROM tarif_malzeme tm
      JOIN malzemeler m ON m.id = tm.malzeme_id WHERE tm.tarif_id = ? ORDER BY m.isim`,
     tarifId
   );

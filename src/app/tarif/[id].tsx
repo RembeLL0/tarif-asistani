@@ -5,13 +5,13 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { golge, Gradyan, Renk } from '@/constants/renkler';
-import { getTarif, getTarifMalzemeleri, type Malzeme, type Tarif } from '@/db/database';
+import { getTarif, getTarifMalzemeleri, type Tarif, type TarifMalzemesi } from '@/db/database';
 
 export default function TarifDetay() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const db = useSQLiteContext();
   const [tarif, setTarif] = useState<Tarif | null>(null);
-  const [malzemeler, setMalzemeler] = useState<Malzeme[]>([]);
+  const [malzemeler, setMalzemeler] = useState<TarifMalzemesi[]>([]);
 
   useEffect(() => {
     getTarif(db, Number(id)).then(setTarif);
@@ -54,7 +54,7 @@ export default function TarifDetay() {
           <View key={m.id} style={[s.malzemeSatir, i > 0 && s.ustCizgi]}>
             <View style={s.nokta} />
             <Text style={s.malzemeYazi}>{m.isim}</Text>
-            <Text style={s.malzemeKategori}>{m.kategori}</Text>
+            <Text style={s.malzemeMiktar}>{m.miktar || m.kategori}</Text>
           </View>
         ))}
       </View>
@@ -105,7 +105,7 @@ const s = StyleSheet.create({
   malzemeSatir: { flexDirection: 'row', gap: 10, alignItems: 'center', paddingVertical: 13 },
   nokta: { width: 8, height: 8, borderRadius: 4, backgroundColor: Renk.ana },
   malzemeYazi: { flex: 1, fontSize: 15, color: Renk.yazi, fontWeight: '600' },
-  malzemeKategori: { fontSize: 12, color: Renk.soluk },
+  malzemeMiktar: { fontSize: 13, color: Renk.sari, fontWeight: '600' },
   adimSatir: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', paddingVertical: 14 },
   adimNo: {
     width: 28,
