@@ -1,5 +1,14 @@
 import { type SQLiteDatabase } from 'expo-sqlite';
 
+import { MALZEMELER, MUTFAKLAR } from './seed-malzemeler';
+import { TURK_TARIFLERI, type SeedTarif } from './seed-tarifler-turk';
+import { ITALYAN_TARIFLERI, MEKSIKA_TARIFLERI, UZAKDOGU_TARIFLERI } from './seed-tarifler-dunya';
+import { KOKTEYL_TARIFLERI } from './seed-kokteyller';
+
+// Seed verisi değiştiğinde bu sürümü artırın; uygulama açılışta
+// veritabanını yeni veriyle baştan kurar.
+const SEMA_SURUMU = 2;
+
 export interface Mutfak {
   id: number;
   isim: string;
@@ -17,6 +26,7 @@ export interface Tarif {
   isim: string;
   mutfak_id: number;
   mutfak: string;
+  kategori: string;
   sure_dk: number;
   adimlar: string;
   tur: 'yemek' | 'kokteyl';
@@ -29,285 +39,88 @@ export interface EslesenTarif extends Tarif {
 }
 
 export async function initDb(db: SQLiteDatabase) {
+  const surum = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
+  if ((surum?.user_version ?? 0) >= SEMA_SURUMU) return;
+
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
-    PRAGMA foreign_keys = ON;
-    CREATE TABLE IF NOT EXISTS mutfaklar (
+    DROP TABLE IF EXISTS tarif_malzeme;
+    DROP TABLE IF EXISTS tarifler;
+    DROP TABLE IF EXISTS malzemeler;
+    DROP TABLE IF EXISTS mutfaklar;
+    CREATE TABLE mutfaklar (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       isim TEXT NOT NULL UNIQUE
     );
-    CREATE TABLE IF NOT EXISTS malzemeler (
+    CREATE TABLE malzemeler (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       isim TEXT NOT NULL UNIQUE,
       kategori TEXT NOT NULL
     );
-    CREATE TABLE IF NOT EXISTS tarifler (
+    CREATE TABLE tarifler (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       isim TEXT NOT NULL,
       mutfak_id INTEGER NOT NULL REFERENCES mutfaklar(id),
+      kategori TEXT NOT NULL DEFAULT 'Diğer',
       sure_dk INTEGER NOT NULL,
       adimlar TEXT NOT NULL,
       tur TEXT NOT NULL DEFAULT 'yemek'
     );
-    CREATE TABLE IF NOT EXISTS tarif_malzeme (
+    CREATE TABLE tarif_malzeme (
       tarif_id INTEGER NOT NULL REFERENCES tarifler(id) ON DELETE CASCADE,
       malzeme_id INTEGER NOT NULL REFERENCES malzemeler(id) ON DELETE CASCADE,
       PRIMARY KEY (tarif_id, malzeme_id)
     );
   `);
 
-  const row = await db.getFirstAsync<{ c: number }>('SELECT COUNT(*) AS c FROM mutfaklar');
-  if (row && row.c === 0) {
-    await seed(db);
-  }
+  await seedYukle(db);
+  await db.execAsync(`PRAGMA user_version = ${SEMA_SURUMU}`);
 }
 
-async function seed(db: SQLiteDatabase) {
-  const mutfaklar = ['Türk Mutfağı', 'İtalyan Mutfağı', 'Meksika Mutfağı', 'Uzak Doğu Mutfağı', 'Kokteyller'];
-
-  const malzemeler: [string, string][] = [
-    ['Domates', 'Sebze & Meyve'],
-    ['Soğan', 'Sebze & Meyve'],
-    ['Sarımsak', 'Sebze & Meyve'],
-    ['Biber', 'Sebze & Meyve'],
-    ['Patlıcan', 'Sebze & Meyve'],
-    ['Patates', 'Sebze & Meyve'],
-    ['Limon', 'Sebze & Meyve'],
-    ['Misket Limonu', 'Sebze & Meyve'],
-    ['Avokado', 'Sebze & Meyve'],
-    ['Nane', 'Sebze & Meyve'],
-    ['Maydanoz', 'Sebze & Meyve'],
-    ['Kıyma', 'Et & Tavuk'],
-    ['Tavuk Göğsü', 'Et & Tavuk'],
-    ['Yumurta', 'Süt Ürünleri & Yumurta'],
-    ['Peynir', 'Süt Ürünleri & Yumurta'],
-    ['Tereyağı', 'Süt Ürünleri & Yumurta'],
-    ['Süt', 'Süt Ürünleri & Yumurta'],
-    ['Krema', 'Süt Ürünleri & Yumurta'],
-    ['Yoğurt', 'Süt Ürünleri & Yumurta'],
-    ['Kırmızı Mercimek', 'Bakliyat & Tahıl'],
-    ['Pirinç', 'Bakliyat & Tahıl'],
-    ['Un', 'Bakliyat & Tahıl'],
-    ['Makarna', 'Bakliyat & Tahıl'],
-    ['Noodle', 'Bakliyat & Tahıl'],
-    ['Tortilla', 'Bakliyat & Tahıl'],
-    ['Tuz', 'Baharat & Sos'],
-    ['Karabiber', 'Baharat & Sos'],
-    ['Pul Biber', 'Baharat & Sos'],
-    ['Zeytinyağı', 'Baharat & Sos'],
-    ['Salça', 'Baharat & Sos'],
-    ['Soya Sosu', 'Baharat & Sos'],
-    ['Şeker', 'Baharat & Sos'],
-    ['Rom', 'İçecek'],
-    ['Soda', 'İçecek'],
-    ['Kola', 'İçecek'],
-  ];
-
-  interface SeedTarif {
-    isim: string;
-    mutfak: string;
-    sure: number;
-    tur: 'yemek' | 'kokteyl';
-    adimlar: string[];
-    malzemeler: string[];
-  }
-
-  const tarifler: SeedTarif[] = [
-    {
-      isim: 'Menemen',
-      mutfak: 'Türk Mutfağı',
-      sure: 20,
-      tur: 'yemek',
-      adimlar: [
-        'Biberleri doğrayıp tereyağında soteleyin.',
-        'Doğranmış domatesleri ekleyip suyunu çekene kadar pişirin.',
-        'Yumurtaları kırıp karıştırın, tuz ve karabiber ekleyin.',
-        'Yumurtalar hafif akışkanken ocaktan alıp sıcak servis edin.',
-      ],
-      malzemeler: ['Domates', 'Biber', 'Yumurta', 'Soğan', 'Tereyağı', 'Tuz', 'Karabiber'],
-    },
-    {
-      isim: 'Kırmızı Mercimek Çorbası',
-      mutfak: 'Türk Mutfağı',
-      sure: 35,
-      tur: 'yemek',
-      adimlar: [
-        'Soğanı doğrayıp tereyağında kavurun.',
-        'Salçayı ekleyip 1 dakika daha kavurun.',
-        'Yıkanmış mercimek ve patatesi ekleyip üzerini geçecek kadar su koyun.',
-        'Mercimekler yumuşayınca blenderdan geçirin, tuz ve pul biberle tatlandırın.',
-      ],
-      malzemeler: ['Kırmızı Mercimek', 'Soğan', 'Patates', 'Salça', 'Tereyağı', 'Tuz', 'Pul Biber'],
-    },
-    {
-      isim: 'Karnıyarık',
-      mutfak: 'Türk Mutfağı',
-      sure: 50,
-      tur: 'yemek',
-      adimlar: [
-        'Patlıcanları alacalı soyup kızartın.',
-        'Kıymayı soğan ve sarımsakla kavurun, doğranmış domates ve salçayı ekleyin.',
-        'Patlıcanların ortasını yarıp iç harcı doldurun.',
-        'Üzerine biber dizip fırında 25 dakika pişirin.',
-      ],
-      malzemeler: ['Patlıcan', 'Kıyma', 'Soğan', 'Sarımsak', 'Domates', 'Biber', 'Salça', 'Zeytinyağı', 'Tuz'],
-    },
-    {
-      isim: 'Fırın Sütlaç',
-      mutfak: 'Türk Mutfağı',
-      sure: 60,
-      tur: 'yemek',
-      adimlar: [
-        'Pirinci az suda haşlayın.',
-        'Süt ve şekeri ekleyip karıştırarak pişirin.',
-        'Az su ile açtığınız unu ekleyip koyulaşana kadar karıştırın.',
-        'Kaselere paylaştırıp fırında üzeri kızarana kadar pişirin.',
-      ],
-      malzemeler: ['Süt', 'Pirinç', 'Şeker', 'Un'],
-    },
-    {
-      isim: 'Spaghetti Pomodoro',
-      mutfak: 'İtalyan Mutfağı',
-      sure: 30,
-      tur: 'yemek',
-      adimlar: [
-        'Makarnayı tuzlu suda haşlayın.',
-        'Zeytinyağında sarımsağı kokusu çıkana kadar soteleyin.',
-        'Doğranmış domatesleri ekleyip sos kıvamına gelene kadar pişirin.',
-        'Makarnayı sosla karıştırıp karabiber serperek servis edin.',
-      ],
-      malzemeler: ['Makarna', 'Domates', 'Sarımsak', 'Zeytinyağı', 'Tuz', 'Karabiber'],
-    },
-    {
-      isim: 'Kremalı Tavuklu Makarna',
-      mutfak: 'İtalyan Mutfağı',
-      sure: 35,
-      tur: 'yemek',
-      adimlar: [
-        'Tavukları kuşbaşı doğrayıp soteleyin.',
-        'Sarımsağı ekleyip 1 dakika çevirin.',
-        'Kremayı ekleyip hafif kaynatın, tuzla tatlandırın.',
-        'Haşlanmış makarnayı sosa ekleyin, rendelenmiş peynirle servis edin.',
-      ],
-      malzemeler: ['Makarna', 'Tavuk Göğsü', 'Krema', 'Sarımsak', 'Peynir', 'Tuz'],
-    },
-    {
-      isim: 'Taco',
-      mutfak: 'Meksika Mutfağı',
-      sure: 30,
-      tur: 'yemek',
-      adimlar: [
-        'Kıymayı soğanla kavurun, tuz ve baharatları ekleyin.',
-        'Domates ve biberi küçük doğrayın.',
-        'Tortillaları tavada ısıtın.',
-        'Tortillanın içine kıyma, sebzeler ve peyniri koyup katlayın.',
-      ],
-      malzemeler: ['Tortilla', 'Kıyma', 'Soğan', 'Domates', 'Biber', 'Peynir', 'Tuz'],
-    },
-    {
-      isim: 'Guacamole',
-      mutfak: 'Meksika Mutfağı',
-      sure: 15,
-      tur: 'yemek',
-      adimlar: [
-        'Avokadoları çatalla ezin.',
-        'Domates ve soğanı çok küçük doğrayıp ekleyin.',
-        'Misket limonu suyu ve tuzu ekleyip karıştırın.',
-        'Cips veya ekmekle servis edin.',
-      ],
-      malzemeler: ['Avokado', 'Domates', 'Soğan', 'Misket Limonu', 'Tuz'],
-    },
-    {
-      isim: 'Tavuklu Noodle',
-      mutfak: 'Uzak Doğu Mutfağı',
-      sure: 25,
-      tur: 'yemek',
-      adimlar: [
-        'Noodle\'ı paket talimatına göre haşlayın.',
-        'Tavukları ince şeritler halinde soteleyin.',
-        'Biber ve sarımsağı ekleyip yüksek ateşte karıştırın.',
-        'Noodle ve soya sosunu ekleyip 2 dakika daha pişirin.',
-      ],
-      malzemeler: ['Noodle', 'Tavuk Göğsü', 'Biber', 'Sarımsak', 'Soya Sosu'],
-    },
-    {
-      isim: 'Yumurtalı Çin Pilavı',
-      mutfak: 'Uzak Doğu Mutfağı',
-      sure: 20,
-      tur: 'yemek',
-      adimlar: [
-        'Pirinci haşlayıp soğutun.',
-        'Yumurtaları tavada çırparak pişirin.',
-        'Sarımsağı ekleyip pirinci tavaya alın.',
-        'Soya sosunu ekleyip yüksek ateşte karıştırarak pişirin.',
-      ],
-      malzemeler: ['Pirinç', 'Yumurta', 'Soya Sosu', 'Sarımsak'],
-    },
-    {
-      isim: 'Mojito',
-      mutfak: 'Kokteyller',
-      sure: 10,
-      tur: 'kokteyl',
-      adimlar: [
-        'Bardakta nane yapraklarını şeker ve misket limonu ile hafifçe ezin.',
-        'Buz ekleyin.',
-        'Romu ekleyip karıştırın.',
-        'Üzerini soda ile tamamlayıp nane ile süsleyin.',
-      ],
-      malzemeler: ['Rom', 'Misket Limonu', 'Nane', 'Şeker', 'Soda'],
-    },
-    {
-      isim: 'Cuba Libre',
-      mutfak: 'Kokteyller',
-      sure: 5,
-      tur: 'kokteyl',
-      adimlar: [
-        'Bardağı buzla doldurun.',
-        'Romu ekleyin.',
-        'Üzerini kola ile tamamlayın.',
-        'Misket limonu dilimi sıkıp bardağa atın.',
-      ],
-      malzemeler: ['Rom', 'Kola', 'Misket Limonu'],
-    },
-    {
-      isim: 'Naneli Ev Limonatası',
-      mutfak: 'Kokteyller',
-      sure: 15,
-      tur: 'kokteyl',
-      adimlar: [
-        'Limonların suyunu sıkın.',
-        'Şekeri az sıcak suda eritip limon suyuna ekleyin.',
-        'Soğuk su ve soda ile tamamlayın.',
-        'Nane yaprakları ve buzla servis edin.',
-      ],
-      malzemeler: ['Limon', 'Şeker', 'Nane', 'Soda'],
-    },
+async function seedYukle(db: SQLiteDatabase) {
+  const tumTarifler: SeedTarif[] = [
+    ...TURK_TARIFLERI,
+    ...ITALYAN_TARIFLERI,
+    ...MEKSIKA_TARIFLERI,
+    ...UZAKDOGU_TARIFLERI,
+    ...KOKTEYL_TARIFLERI,
   ];
 
   await db.withTransactionAsync(async () => {
     const mutfakId = new Map<string, number>();
-    for (const isim of mutfaklar) {
+    for (const isim of MUTFAKLAR) {
       const r = await db.runAsync('INSERT INTO mutfaklar (isim) VALUES (?)', isim);
       mutfakId.set(isim, r.lastInsertRowId);
     }
 
     const malzemeId = new Map<string, number>();
-    for (const [isim, kategori] of malzemeler) {
-      const r = await db.runAsync('INSERT INTO malzemeler (isim, kategori) VALUES (?, ?)', isim, kategori);
-      malzemeId.set(isim, r.lastInsertRowId);
+    for (const [isim, kategori] of MALZEMELER) {
+      const r = await db.runAsync('INSERT OR IGNORE INTO malzemeler (isim, kategori) VALUES (?, ?)', isim, kategori);
+      if (r.changes > 0) malzemeId.set(isim, r.lastInsertRowId);
     }
 
-    for (const t of tarifler) {
+    // Tarif içinde geçen ama sözlükte olmayan malzemeyi otomatik ekler.
+    const malzemeBul = async (isim: string): Promise<number> => {
+      const mevcut = malzemeId.get(isim);
+      if (mevcut !== undefined) return mevcut;
+      const r = await db.runAsync('INSERT OR IGNORE INTO malzemeler (isim, kategori) VALUES (?, ?)', isim, 'Diğer');
+      const id = r.changes > 0
+        ? r.lastInsertRowId
+        : (await db.getFirstAsync<{ id: number }>('SELECT id FROM malzemeler WHERE isim = ?', isim))!.id;
+      malzemeId.set(isim, id);
+      return id;
+    };
+
+    for (const t of tumTarifler) {
+      const mid = mutfakId.get(t.mutfak);
+      if (mid === undefined) continue;
       const r = await db.runAsync(
-        'INSERT INTO tarifler (isim, mutfak_id, sure_dk, adimlar, tur) VALUES (?, ?, ?, ?, ?)',
-        t.isim,
-        mutfakId.get(t.mutfak)!,
-        t.sure,
-        t.adimlar.join('\n'),
-        t.tur
+        'INSERT INTO tarifler (isim, mutfak_id, kategori, sure_dk, adimlar, tur) VALUES (?, ?, ?, ?, ?, ?)',
+        t.isim, mid, t.kategori, t.sure, t.adimlar.join('\n'), t.tur
       );
       for (const m of t.malzemeler) {
-        await db.runAsync('INSERT INTO tarif_malzeme (tarif_id, malzeme_id) VALUES (?, ?)', r.lastInsertRowId, malzemeId.get(m)!);
+        const malzId = await malzemeBul(m);
+        await db.runAsync('INSERT OR IGNORE INTO tarif_malzeme (tarif_id, malzeme_id) VALUES (?, ?)', r.lastInsertRowId, malzId);
       }
     }
   });
@@ -319,7 +132,7 @@ export async function getMutfaklar(db: SQLiteDatabase): Promise<Mutfak[]> {
     FROM mutfaklar m
     LEFT JOIN tarifler t ON t.mutfak_id = m.id
     GROUP BY m.id
-    ORDER BY m.isim
+    ORDER BY tarifSayisi DESC, m.isim
   `);
 }
 
@@ -330,7 +143,7 @@ export async function getMalzemeler(db: SQLiteDatabase): Promise<Malzeme[]> {
 export async function getTariflerByMutfak(db: SQLiteDatabase, mutfakId: number): Promise<Tarif[]> {
   return db.getAllAsync<Tarif>(
     `SELECT t.*, m.isim AS mutfak FROM tarifler t JOIN mutfaklar m ON m.id = t.mutfak_id
-     WHERE t.mutfak_id = ? ORDER BY t.isim`,
+     WHERE t.mutfak_id = ? ORDER BY t.kategori, t.isim`,
     mutfakId
   );
 }
@@ -350,6 +163,13 @@ export async function getTarifMalzemeleri(db: SQLiteDatabase, tarifId: number): 
   );
 }
 
+export async function getTarifKategorileri(db: SQLiteDatabase): Promise<string[]> {
+  const satirlar = await db.getAllAsync<{ kategori: string }>(
+    'SELECT DISTINCT kategori FROM tarifler ORDER BY kategori'
+  );
+  return satirlar.map((s) => s.kategori);
+}
+
 // Seçilen malzemelere göre tarifleri bulur: tam eşleşenler önce,
 // ardından eksik malzeme sayısı en az olanlar gelir.
 export async function malzemeyeGoreTarifBul(db: SQLiteDatabase, malzemeIds: number[]): Promise<EslesenTarif[]> {
@@ -365,7 +185,8 @@ export async function malzemeyeGoreTarifBul(db: SQLiteDatabase, malzemeIds: numb
      JOIN tarif_malzeme tm ON tm.tarif_id = t.id
      GROUP BY t.id
      HAVING eslesen > 0
-     ORDER BY (toplam - eslesen) ASC, eslesen DESC, t.isim`,
+     ORDER BY (CAST(eslesen AS REAL) / toplam) DESC, (toplam - eslesen) ASC, t.isim
+     LIMIT 60`,
     ...malzemeIds
   );
 
@@ -392,14 +213,15 @@ export async function ekleMalzeme(db: SQLiteDatabase, isim: string, kategori: st
 
 export async function ekleTarif(
   db: SQLiteDatabase,
-  tarif: { isim: string; mutfakId: number; sureDk: number; adimlar: string; tur: 'yemek' | 'kokteyl' },
+  tarif: { isim: string; mutfakId: number; kategori: string; sureDk: number; adimlar: string; tur: 'yemek' | 'kokteyl' },
   malzemeIds: number[]
 ): Promise<void> {
   await db.withTransactionAsync(async () => {
     const r = await db.runAsync(
-      'INSERT INTO tarifler (isim, mutfak_id, sure_dk, adimlar, tur) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO tarifler (isim, mutfak_id, kategori, sure_dk, adimlar, tur) VALUES (?, ?, ?, ?, ?, ?)',
       tarif.isim.trim(),
       tarif.mutfakId,
+      tarif.kategori.trim(),
       tarif.sureDk,
       tarif.adimlar.trim(),
       tarif.tur

@@ -43,7 +43,7 @@ export default function TarifDetay() {
             <Text style={s.etiketYazi}>⏱ {tarif.sure_dk} dk</Text>
           </View>
           <View style={s.etiket}>
-            <Text style={s.etiketYazi}>{kokteyl ? 'Kokteyl' : 'Yemek'}</Text>
+            <Text style={s.etiketYazi}>{tarif.kategori}</Text>
           </View>
         </View>
       </LinearGradient>

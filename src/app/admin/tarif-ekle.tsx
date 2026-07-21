@@ -4,7 +4,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { Renk } from '@/constants/renkler';
-import { ekleTarif, getMalzemeler, getMutfaklar, type Malzeme, type Mutfak } from '@/db/database';
+import { ekleTarif, getMalzemeler, getMutfaklar, getTarifKategorileri, type Malzeme, type Mutfak } from '@/db/database';
 
 export default function TarifEkle() {
   const db = useSQLiteContext();
@@ -14,6 +14,8 @@ export default function TarifEkle() {
 
   const [isim, setIsim] = useState('');
   const [mutfakId, setMutfakId] = useState<number | null>(null);
+  const [kategori, setKategori] = useState('');
+  const [mevcutKategoriler, setMevcutKategoriler] = useState<string[]>([]);
   const [sure, setSure] = useState('');
   const [tur, setTur] = useState<'yemek' | 'kokteyl'>('yemek');
   const [adimlar, setAdimlar] = useState('');
@@ -23,6 +25,7 @@ export default function TarifEkle() {
     useCallback(() => {
       getMutfaklar(db).then(setMutfaklar);
       getMalzemeler(db).then(setMalzemeler);
+      getTarifKategorileri(db).then(setMevcutKategoriler);
     }, [db])
   );
 
@@ -47,6 +50,7 @@ export default function TarifEkle() {
   const gecerli =
     isim.trim().length > 0 &&
     mutfakId !== null &&
+    kategori.trim().length > 0 &&
     Number(sure) > 0 &&
     adimlar.trim().length > 0 &&
     seciliMalzeme.size > 0;
@@ -55,7 +59,7 @@ export default function TarifEkle() {
     if (!gecerli || mutfakId === null) return;
     await ekleTarif(
       db,
-      { isim, mutfakId, sureDk: Number(sure), adimlar, tur },
+      { isim, mutfakId, kategori, sureDk: Number(sure), adimlar, tur },
       [...seciliMalzeme]
     );
     Alert.alert('Eklendi ✓', `"${isim.trim()}" tarifi ${seciliMalzeme.size} malzemesiyle kaydedildi.`, [
@@ -86,6 +90,26 @@ export default function TarifEkle() {
           </Pressable>
         ))}
       </View>
+
+      <Text style={s.etiket}>Tarif Kategorisi</Text>
+      <View style={s.cipler}>
+        {mevcutKategoriler.map((k) => (
+          <Pressable
+            key={k}
+            style={[s.cip, kategori === k && s.cipSecili]}
+            onPress={() => setKategori(k)}
+          >
+            <Text style={[s.cipYazi, kategori === k && s.cipYaziSecili]}>{k}</Text>
+          </Pressable>
+        ))}
+      </View>
+      <TextInput
+        style={s.girdi}
+        value={kategori}
+        onChangeText={setKategori}
+        placeholder="veya yeni kategori yaz (ör. Çorbalar)"
+        placeholderTextColor={Renk.soluk}
+      />
 
       <View style={s.yanYana}>
         <View style={{ flex: 1 }}>
