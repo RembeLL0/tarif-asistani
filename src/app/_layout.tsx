@@ -1,18 +1,33 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { Stack } from 'expo-router';
+import { SQLiteProvider } from 'expo-sqlite';
+import { StatusBar } from 'expo-status-bar';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import { Renk } from '@/constants/renkler';
+import { initDb } from '@/db/database';
 
-SplashScreen.preventAutoHideAsync();
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <SQLiteProvider databaseName="tarif-asistani.db" onInit={initDb}>
+      <StatusBar style="light" />
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: Renk.arka },
+          headerTintColor: Renk.yazi,
+          headerTitleStyle: { fontWeight: '800' },
+          headerShadowVisible: false,
+          contentStyle: { backgroundColor: Renk.arka },
+        }}
+      >
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="mutfak/[id]" options={{ title: 'Mutfak' }} />
+        <Stack.Screen name="tarif/[id]" options={{ title: '', headerTransparent: true, headerTintColor: '#fff' }} />
+        <Stack.Screen name="malzeme-sec" options={{ title: 'Evde Ne Var?' }} />
+        <Stack.Screen name="sonuclar" options={{ title: 'Bulunan Tarifler' }} />
+        <Stack.Screen name="admin/index" options={{ title: 'Veri Girişi' }} />
+        <Stack.Screen name="admin/mutfak-ekle" options={{ title: 'Mutfak Ekle' }} />
+        <Stack.Screen name="admin/malzeme-ekle" options={{ title: 'Malzeme Ekle' }} />
+        <Stack.Screen name="admin/tarif-ekle" options={{ title: 'Tarif Ekle' }} />
+      </Stack>
+    </SQLiteProvider>
   );
 }
