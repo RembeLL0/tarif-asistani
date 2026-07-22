@@ -1,27 +1,39 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { golge, Gradyan, Renk } from '@/constants/renkler';
 import { getTarif, getTarifMalzemeleri, type Tarif, type TarifMalzemesi } from '@/db/database';
+import { miktarOlcekle } from '@/db/olcek';
+
+const MIN_PORSIYON = 1;
+const MAX_PORSIYON = 24;
 
 export default function TarifDetay() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const db = useSQLiteContext();
   const [tarif, setTarif] = useState<Tarif | null>(null);
   const [malzemeler, setMalzemeler] = useState<TarifMalzemesi[]>([]);
+  // Kullanıcının seçtiği kişi sayısı. Tarif yüklenince tabanına eşitlenir.
+  const [porsiyon, setPorsiyon] = useState<number | null>(null);
 
   useEffect(() => {
-    getTarif(db, Number(id)).then(setTarif);
+    getTarif(db, Number(id)).then((t) => {
+      setTarif(t);
+      setPorsiyon(t?.porsiyon ?? null);
+    });
     getTarifMalzemeleri(db, Number(id)).then(setMalzemeler);
   }, [db, id]);
 
-  if (!tarif) return null;
+  if (!tarif || porsiyon === null) return null;
 
   const kokteyl = tarif.tur === 'kokteyl';
   const adimlar = tarif.adimlar.split('\n').filter((a) => a.trim().length > 0);
+  const oran = porsiyon / tarif.porsiyon;
+  const azalt = () => setPorsiyon((p) => Math.max(MIN_PORSIYON, (p ?? tarif.porsiyon) - 1));
+  const artir = () => setPorsiyon((p) => Math.min(MAX_PORSIYON, (p ?? tarif.porsiyon) + 1));
 
   return (
     <ScrollView style={s.kap} contentContainerStyle={s.icerik}>
@@ -50,16 +62,37 @@ export default function TarifDetay() {
 
       <View style={s.malzemeBaslikSatir}>
         <Text style={s.bolumBaslik}>🧾 Malzemeler</Text>
-        <View style={s.porsiyonRozet}>
-          <Text style={s.porsiyonYazi}>👥 {tarif.porsiyon} kişilik</Text>
+        <View style={s.porsiyonKontrol}>
+          <Pressable
+            onPress={azalt}
+            disabled={porsiyon <= MIN_PORSIYON}
+            hitSlop={8}
+            style={[s.porsiyonButon, porsiyon <= MIN_PORSIYON && s.porsiyonButonPasif]}
+          >
+            <Text style={s.porsiyonButonYazi}>−</Text>
+          </Pressable>
+          <Text style={s.porsiyonYazi}>👥 {porsiyon} kişilik</Text>
+          <Pressable
+            onPress={artir}
+            disabled={porsiyon >= MAX_PORSIYON}
+            hitSlop={8}
+            style={[s.porsiyonButon, porsiyon >= MAX_PORSIYON && s.porsiyonButonPasif]}
+          >
+            <Text style={s.porsiyonButonYazi}>＋</Text>
+          </Pressable>
         </View>
       </View>
+      {oran !== 1 && (
+        <Text style={s.olcekNot}>Miktarlar {porsiyon} kişiye göre ayarlandı</Text>
+      )}
       <View style={[s.kart, golge]}>
         {malzemeler.map((m, i) => (
           <View key={m.id} style={[s.malzemeSatir, i > 0 && s.ustCizgi]}>
             <View style={s.nokta} />
             <Text style={s.malzemeYazi}>{m.isim}</Text>
-            <Text style={s.malzemeMiktar}>{m.miktar || m.kategori}</Text>
+            <Text style={s.malzemeMiktar}>
+              {m.miktar ? miktarOlcekle(m.miktar, oran) : m.kategori}
+            </Text>
           </View>
         ))}
       </View>
@@ -101,14 +134,28 @@ const s = StyleSheet.create({
   etiketYazi: { color: '#fff', fontSize: 13, fontWeight: '700' },
   bolumBaslik: { fontSize: 17, fontWeight: '800', color: Renk.yazi, marginBottom: 10 },
   malzemeBaslikSatir: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  porsiyonRozet: {
+  porsiyonKontrol: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: Renk.anaSoft,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 22,
     marginBottom: 10,
   },
-  porsiyonYazi: { color: Renk.ana, fontSize: 13, fontWeight: '700' },
+  porsiyonButon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Renk.ana,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  porsiyonButonPasif: { backgroundColor: Renk.cizgi },
+  porsiyonButonYazi: { color: '#fff', fontSize: 18, fontWeight: '800', lineHeight: 20 },
+  porsiyonYazi: { color: Renk.ana, fontSize: 13, fontWeight: '800', minWidth: 78, textAlign: 'center' },
+  olcekNot: { color: Renk.soluk, fontSize: 12, fontStyle: 'italic', marginTop: -4, marginBottom: 10 },
   kart: {
     backgroundColor: Renk.kart,
     borderRadius: 20,
