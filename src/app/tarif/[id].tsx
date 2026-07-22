@@ -9,7 +9,7 @@ import { getTarif, getTarifMalzemeleri, type Tarif, type TarifMalzemesi } from '
 import { miktarOlcekle } from '@/db/olcek';
 
 const MIN_PORSIYON = 1;
-const MAX_PORSIYON = 24;
+const MAX_PORSIYON = 5;
 
 export default function TarifDetay() {
   const { id } = useLocalSearchParams<{ id: string }>();
