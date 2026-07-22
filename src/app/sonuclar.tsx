@@ -6,6 +6,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 
 import { golge, Renk } from '@/constants/renkler';
 import { malzemeyeGoreTarifBul, type EslesenTarif } from '@/db/database';
+import { YEREL_RESIM } from '@/db/yerel-resimler';
 
 export default function Sonuclar() {
   const { ids } = useLocalSearchParams<{ ids: string }>();
@@ -59,8 +60,8 @@ export default function Sonuclar() {
               {({ pressed }) => (
                 <View style={[s.kart, golge, pressed && s.basili]}>
                   <View style={s.kartUst}>
-                    {item.resim_url ? (
-                      <Image source={{ uri: item.resim_url }} style={s.kartResim} contentFit="cover" transition={200} />
+                    {YEREL_RESIM[item.isim] ? (
+                      <Image source={YEREL_RESIM[item.isim]} style={s.kartResim} contentFit="cover" transition={200} />
                     ) : (
                       <View style={[s.emojiKutu, item.tur === 'kokteyl' && s.emojiKutuKokteyl]}>
                         <Text style={s.kartEmoji}>{item.tur === 'kokteyl' ? '🍹' : '🍽️'}</Text>

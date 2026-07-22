@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { YEREL_RESIM } from '@/db/yerel-resimler';
 import { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, SectionList, StyleSheet, Text, View } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -129,8 +130,8 @@ export default function MutfakDetay() {
           <Pressable onPress={() => router.push(`/tarif/${item.id}`)}>
             {({ pressed }) => (
               <View style={[s.kart, golge, pressed && s.basili]}>
-                {item.resim_url ? (
-                  <Image source={{ uri: item.resim_url }} style={s.kartResim} contentFit="cover" transition={200} />
+                {YEREL_RESIM[item.isim] ? (
+                  <Image source={YEREL_RESIM[item.isim]} style={s.kartResim} contentFit="cover" transition={200} />
                 ) : (
                   <View style={[s.emojiKutu, item.tur === 'kokteyl' && s.emojiKutuKokteyl]}>
                     <Text style={s.kartEmoji}>{item.tur === 'kokteyl' ? '🍹' : '🍽️'}</Text>

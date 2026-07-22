@@ -8,6 +8,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { golge, Gradyan, Renk } from '@/constants/renkler';
 import { getTarif, getTarifMalzemeleri, type Tarif, type TarifMalzemesi } from '@/db/database';
 import { miktarOlcekle } from '@/db/olcek';
+import { YEREL_RESIM } from '@/db/yerel-resimler';
 
 const MIN_PORSIYON = 1;
 const MAX_PORSIYON = 5;
@@ -31,6 +32,7 @@ export default function TarifDetay() {
   if (!tarif || porsiyon === null) return null;
 
   const kokteyl = tarif.tur === 'kokteyl';
+  const resim = YEREL_RESIM[tarif.isim];
   const adimlar = tarif.adimlar.split('\n').filter((a) => a.trim().length > 0);
   const oran = porsiyon / tarif.porsiyon;
   const azalt = () => setPorsiyon((p) => Math.max(MIN_PORSIYON, (p ?? tarif.porsiyon) - 1));
@@ -41,10 +43,10 @@ export default function TarifDetay() {
       <Stack.Screen options={{ title: '' }} />
 
       <View style={[s.kapak, golge]}>
-        {tarif.resim_url ? (
+        {resim ? (
           <>
             <Image
-              source={{ uri: tarif.resim_url }}
+              source={resim}
               style={StyleSheet.absoluteFill}
               contentFit="cover"
               transition={250}
@@ -62,7 +64,7 @@ export default function TarifDetay() {
             style={StyleSheet.absoluteFill}
           />
         )}
-        {!tarif.resim_url && <Text style={s.kapakEmoji}>{kokteyl ? '🍹' : '🥘'}</Text>}
+        {!resim && <Text style={s.kapakEmoji}>{kokteyl ? '🍹' : '🥘'}</Text>}
         <Text style={s.kapakBaslik}>{tarif.isim}</Text>
         <View style={s.etiketler}>
           <View style={s.etiket}>

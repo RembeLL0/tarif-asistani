@@ -4,11 +4,10 @@ import { MALZEMELER, MUTFAKLAR } from './seed-malzemeler';
 import { TURK_TARIFLERI, type SeedTarif } from './seed-tarifler-turk';
 import { ITALYAN_TARIFLERI, MEKSIKA_TARIFLERI, UZAKDOGU_TARIFLERI } from './seed-tarifler-dunya';
 import { KOKTEYL_TARIFLERI } from './seed-kokteyller';
-import { TARIF_RESIMLERI } from './seed-resimler';
 
 // Seed verisi değiştiğinde bu sürümü artırın; uygulama açılışta
 // veritabanını yeni veriyle baştan kurar.
-const SEMA_SURUMU = 6;
+const SEMA_SURUMU = 7;
 
 export interface Mutfak {
   id: number;
@@ -32,7 +31,6 @@ export interface Tarif {
   adimlar: string;
   tur: 'yemek' | 'kokteyl';
   porsiyon: number;
-  resim_url: string;
 }
 
 export interface TarifMalzemesi extends Malzeme {
@@ -57,7 +55,6 @@ async function semaGuncelMi(db: SQLiteDatabase): Promise<boolean> {
     const tarifKolonlar = await db.getAllAsync<{ name: string }>('PRAGMA table_info(tarifler)');
     if (!tarifKolonlar.some((k) => k.name === 'kategori')) return false;
     if (!tarifKolonlar.some((k) => k.name === 'porsiyon')) return false;
-    if (!tarifKolonlar.some((k) => k.name === 'resim_url')) return false;
   } catch {
     return false;
   }
@@ -90,8 +87,7 @@ export async function initDb(db: SQLiteDatabase) {
       sure_dk INTEGER NOT NULL,
       adimlar TEXT NOT NULL,
       tur TEXT NOT NULL DEFAULT 'yemek',
-      porsiyon INTEGER NOT NULL DEFAULT 4,
-      resim_url TEXT NOT NULL DEFAULT ''
+      porsiyon INTEGER NOT NULL DEFAULT 4
     );
     CREATE TABLE tarif_malzeme (
       tarif_id INTEGER NOT NULL REFERENCES tarifler(id) ON DELETE CASCADE,
@@ -156,9 +152,8 @@ async function seedYukle(db: SQLiteDatabase) {
       const mid = mutfakId.get(t.mutfak);
       if (mid === undefined) continue;
       const r = await db.runAsync(
-        'INSERT INTO tarifler (isim, mutfak_id, kategori, sure_dk, adimlar, tur, porsiyon, resim_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        t.isim, mid, t.kategori, t.sure, t.adimlar.join('\n'), t.tur, porsiyonHesapla(t),
-        TARIF_RESIMLERI[t.isim] ?? ''
+        'INSERT INTO tarifler (isim, mutfak_id, kategori, sure_dk, adimlar, tur, porsiyon) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        t.isim, mid, t.kategori, t.sure, t.adimlar.join('\n'), t.tur, porsiyonHesapla(t)
       );
       for (const [mIsim, miktar] of t.malzemeler) {
         const malzId = await malzemeBul(mIsim);
