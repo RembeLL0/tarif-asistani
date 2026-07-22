@@ -486,12 +486,12 @@ export const TURK_1: SeedTarif[] = [
       ['Tuz', '1 tatlı kaşığı'],
     ],
     adimlar: [
-      'Patatesleri kabuklarıyla yıkayıp tencereye koyun, üzerini geçen suda haşlayın. Bıçak ucu kolayca giriyorsa (yaklaşık 20-25 dakika) hazırdır. Kabuklu haşlamak dağılmalarını önler.',
-      'Süzüp biraz soğumaya bırakın; el yakmayacak sıcaklıkta kabuklarını soyun.',
-      'Patatesleri iri küpler halinde doğrayıp geniş bir kaba alın.',
-      'Taze soğan, maydanoz ve dereotunu ince kıyıp ekleyin.',
-      'Zeytinyağı, limon suyu, tuz ve pul biberi küçük bir kavanozda çalkalayıp sos yapın; salatanın üzerine gezdirin.',
-      'Patatesleri ezmeden, alttan üste nazikçe karıştırın. Ilık da soğuk da çok güzeldir.',
+      'Patatesleri kabuklarıyla yıkayıp tencereye koyun, üzerini bir parmak geçecek kadar tuzlu suyla haşlayın. Kabuklu haşlamak, patatesin dağılmasını ve suya çekip sulanmasını önler. Bıçak ucu ya da çatal ortasına kolayca giriyorsa (yaklaşık 20-25 dakika, boyutuna göre) hazırdır. Fazla haşlarsanız ezik olur.',
+      'Patatesleri süzüp birkaç dakika soğumaya bırakın; el yakmayacak, ama hâlâ ılık sıcaklıkta kabuklarını soyun. Sıcakken soymak hem kolaydır hem de patates baharatı ve sosu ılıkken daha iyi emer.',
+      'Patatesleri iri küpler (bir ısırıklık) halinde doğrayıp geniş bir kaba alın.',
+      'Taze soğanı, maydanozu ve dereotunu ince ince kıyıp patateslerin üzerine ekleyin. Bol yeşillik bu salatanın tazeliğinin sırrıdır.',
+      'Sos için zeytinyağı, taze limon suyu, tuz ve pul biberi küçük bir kavanozda çalkalayarak emülsiyon haline getirin (çalkalamak yağ ve limonu güzelce birleştirir); salatanın üzerine gezdirin.',
+      'Patatesleri ezmemeye özen göstererek, kaşıkla alttan üste doğru nazikçe karıştırın. Patatesler ılıkken karıştırmak sosun içeri işlemesini sağlar. Ilık ya da oda sıcaklığında, mangalın ve balığın yanında harika gider; buzdolabında soğuk da tüketilebilir.',
     ],
   },
   {

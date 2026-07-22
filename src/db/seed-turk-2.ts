@@ -435,12 +435,12 @@ export const TURK_2: SeedTarif[] = [
       ['Karabiber', 'yarım çay kaşığı'],
     ],
     adimlar: [
-      'Köfte harcı: kıyma, rendelenmiş soğan, galeta unu, yumurta, kimyon, tuz ve karabiberi 5 dakika yoğurun.',
-      'Harçtan iri toplar yapıp fırın kabına dizin; her topun ortasına parmağınızla veya kaşığın arkasıyla çukur açın — küçük birer çanak gibi olacaklar.',
-      '200 derece fırında 15 dakika ön pişirme yapın.',
-      'Püre için: patatesleri haşlayıp ezin; sıcakken süt, 1 kaşık tereyağı ve tuz ekleyip pürüzsüzleşene kadar karıştırın.',
-      'Fırından çıkan köftelerin çukurlarına pürelerden bolca doldurun, üzerlerine rendelenmiş kaşar serpin.',
-      'Salçayı 1 su bardağı sıcak suda ezip kabın kenarlarından dökün. 190 derece fırında, peynirler kızarana kadar 15 dakika daha pişirin.',
+      'Köfte harcı: kıyma, rendelenmiş soğan (suyunu hafif sıkın), galeta unu, yumurta, kimyon, tuz ve karabiberi geniş bir kapta en az 5 dakika, macun kıvamına gelene kadar yoğurun. İyi yoğrulmuş harç fırında dağılmaz.',
+      'Harçtan iri toplar yapıp fırın kabına aralıklı dizin. Her topun ortasına başparmağınızla veya kaşığın arkasıyla derin bir çukur açın — küçük birer çanak, yuva gibi olmalılar; birazdan bu çukurları püreyle dolduracağız.',
+      'Önceden ısıtılmış 200 derece fırında 15 dakika ön pişirme yapın. Köfteler suyunu salıp hafif kızaracak; çıkan suyu dökün.',
+      'Bu arada püreyi hazırlayın: patatesleri haşlayıp süzün ve sıcakken ezin. Üzerine süt, 1 kaşık tereyağı ve tuz ekleyip pürüzsüz, kremamsı bir püre olana kadar çırpın. Sıcak patates püresi daha ipeksi olur.',
+      'Fırından çıkan köftelerin çukurlarına püreden bolca, tepeleme doldurun (sıkma torbasıyla daha şık olur). Üzerlerine rendelenmiş kaşar peynirini serpin.',
+      'Salçayı 1 su bardağı sıcak suda ezip kabın kenarlarından (köftelerin üzerine değil) dökün; bu sos köftelerin kurumasını önler ve tabana lezzet katar. 190 derece fırında, peynirler eriyip altın rengi kızarana kadar 15 dakika daha pişirin. Sıcak servis edin — çukurundaki peynirli püresiyle Hasanpaşa köfte, sofraların gösterişli yemeğidir.',
     ],
   },
   {
