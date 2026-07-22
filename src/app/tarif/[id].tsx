@@ -48,7 +48,12 @@ export default function TarifDetay() {
         </View>
       </LinearGradient>
 
-      <Text style={s.bolumBaslik}>🧾 Malzemeler</Text>
+      <View style={s.malzemeBaslikSatir}>
+        <Text style={s.bolumBaslik}>🧾 Malzemeler</Text>
+        <View style={s.porsiyonRozet}>
+          <Text style={s.porsiyonYazi}>👥 {tarif.porsiyon} kişilik</Text>
+        </View>
+      </View>
       <View style={[s.kart, golge]}>
         {malzemeler.map((m, i) => (
           <View key={m.id} style={[s.malzemeSatir, i > 0 && s.ustCizgi]}>
@@ -95,6 +100,15 @@ const s = StyleSheet.create({
   },
   etiketYazi: { color: '#fff', fontSize: 13, fontWeight: '700' },
   bolumBaslik: { fontSize: 17, fontWeight: '800', color: Renk.yazi, marginBottom: 10 },
+  malzemeBaslikSatir: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  porsiyonRozet: {
+    backgroundColor: Renk.anaSoft,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginBottom: 10,
+  },
+  porsiyonYazi: { color: Renk.ana, fontSize: 13, fontWeight: '700' },
   kart: {
     backgroundColor: Renk.kart,
     borderRadius: 20,

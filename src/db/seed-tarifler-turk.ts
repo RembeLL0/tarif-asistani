@@ -13,6 +13,8 @@ export interface SeedTarif {
   adimlar: string[];
   /** [malzeme adı, miktar] — örn. ['Kıyma', '500 g'] */
   malzemeler: [string, string][];
+  /** Kaç kişilik/porsiyon. Belirtilmezse kategoriye göre otomatik atanır. */
+  porsiyon?: number;
 }
 
 import { TURK_1 } from './seed-turk-1';

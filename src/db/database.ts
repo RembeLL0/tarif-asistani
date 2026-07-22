@@ -7,7 +7,7 @@ import { KOKTEYL_TARIFLERI } from './seed-kokteyller';
 
 // Seed verisi değiştiğinde bu sürümü artırın; uygulama açılışta
 // veritabanını yeni veriyle baştan kurar.
-const SEMA_SURUMU = 3;
+const SEMA_SURUMU = 4;
 
 export interface Mutfak {
   id: number;
@@ -30,6 +30,7 @@ export interface Tarif {
   sure_dk: number;
   adimlar: string;
   tur: 'yemek' | 'kokteyl';
+  porsiyon: number;
 }
 
 export interface TarifMalzemesi extends Malzeme {
@@ -42,9 +43,26 @@ export interface EslesenTarif extends Tarif {
   eksikler: string[];
 }
 
-export async function initDb(db: SQLiteDatabase) {
+// Şemanın güncel olup olmadığını hem sürüm numarası hem de gerçek yapı
+// üzerinden doğrular. Eski bir veritabanı dosyası (ör. "miktar" kolonu
+// eklenmeden önce oluşmuş) sürüm numarası ne olursa olsun yenilenir.
+async function semaGuncelMi(db: SQLiteDatabase): Promise<boolean> {
   const surum = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
-  if ((surum?.user_version ?? 0) >= SEMA_SURUMU) return;
+  if ((surum?.user_version ?? 0) < SEMA_SURUMU) return false;
+  try {
+    const kolonlar = await db.getAllAsync<{ name: string }>('PRAGMA table_info(tarif_malzeme)');
+    if (!kolonlar.some((k) => k.name === 'miktar')) return false;
+    const tarifKolonlar = await db.getAllAsync<{ name: string }>('PRAGMA table_info(tarifler)');
+    if (!tarifKolonlar.some((k) => k.name === 'kategori')) return false;
+    if (!tarifKolonlar.some((k) => k.name === 'porsiyon')) return false;
+  } catch {
+    return false;
+  }
+  return true;
+}
+
+export async function initDb(db: SQLiteDatabase) {
+  if (await semaGuncelMi(db)) return;
 
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
@@ -68,7 +86,8 @@ export async function initDb(db: SQLiteDatabase) {
       kategori TEXT NOT NULL DEFAULT 'Diğer',
       sure_dk INTEGER NOT NULL,
       adimlar TEXT NOT NULL,
-      tur TEXT NOT NULL DEFAULT 'yemek'
+      tur TEXT NOT NULL DEFAULT 'yemek',
+      porsiyon INTEGER NOT NULL DEFAULT 4
     );
     CREATE TABLE tarif_malzeme (
       tarif_id INTEGER NOT NULL REFERENCES tarifler(id) ON DELETE CASCADE,
@@ -80,6 +99,19 @@ export async function initDb(db: SQLiteDatabase) {
 
   await seedYukle(db);
   await db.execAsync(`PRAGMA user_version = ${SEMA_SURUMU}`);
+}
+
+// Tarif için porsiyon sayısı: elle belirtilmişse onu, yoksa kategoriye göre
+// makul bir varsayılan kullanır.
+function porsiyonHesapla(t: SeedTarif): number {
+  if (t.porsiyon && t.porsiyon > 0) return t.porsiyon;
+  if (t.tur === 'kokteyl') return 1;
+  const k = t.kategori.toLocaleLowerCase('tr');
+  if (k.includes('tatlı')) return 6;
+  if (k.includes('çorba')) return 4;
+  if (k.includes('meze') || k.includes('salata')) return 4;
+  if (k.includes('hamur')) return 6;
+  return 4;
 }
 
 async function seedYukle(db: SQLiteDatabase) {
@@ -120,8 +152,8 @@ async function seedYukle(db: SQLiteDatabase) {
       const mid = mutfakId.get(t.mutfak);
       if (mid === undefined) continue;
       const r = await db.runAsync(
-        'INSERT INTO tarifler (isim, mutfak_id, kategori, sure_dk, adimlar, tur) VALUES (?, ?, ?, ?, ?, ?)',
-        t.isim, mid, t.kategori, t.sure, t.adimlar.join('\n'), t.tur
+        'INSERT INTO tarifler (isim, mutfak_id, kategori, sure_dk, adimlar, tur, porsiyon) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        t.isim, mid, t.kategori, t.sure, t.adimlar.join('\n'), t.tur, porsiyonHesapla(t)
       );
       for (const [mIsim, miktar] of t.malzemeler) {
         const malzId = await malzemeBul(mIsim);
@@ -221,18 +253,19 @@ export async function ekleMalzeme(db: SQLiteDatabase, isim: string, kategori: st
 
 export async function ekleTarif(
   db: SQLiteDatabase,
-  tarif: { isim: string; mutfakId: number; kategori: string; sureDk: number; adimlar: string; tur: 'yemek' | 'kokteyl' },
+  tarif: { isim: string; mutfakId: number; kategori: string; sureDk: number; adimlar: string; tur: 'yemek' | 'kokteyl'; porsiyon?: number },
   malzemeIds: number[]
 ): Promise<void> {
   await db.withTransactionAsync(async () => {
     const r = await db.runAsync(
-      'INSERT INTO tarifler (isim, mutfak_id, kategori, sure_dk, adimlar, tur) VALUES (?, ?, ?, ?, ?, ?)',
+      'INSERT INTO tarifler (isim, mutfak_id, kategori, sure_dk, adimlar, tur, porsiyon) VALUES (?, ?, ?, ?, ?, ?, ?)',
       tarif.isim.trim(),
       tarif.mutfakId,
       tarif.kategori.trim(),
       tarif.sureDk,
       tarif.adimlar.trim(),
-      tarif.tur
+      tarif.tur,
+      tarif.porsiyon && tarif.porsiyon > 0 ? tarif.porsiyon : 4
     );
     for (const mid of malzemeIds) {
       await db.runAsync('INSERT INTO tarif_malzeme (tarif_id, malzeme_id) VALUES (?, ?)', r.lastInsertRowId, mid);
