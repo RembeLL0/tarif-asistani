@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -58,9 +59,13 @@ export default function Sonuclar() {
               {({ pressed }) => (
                 <View style={[s.kart, golge, pressed && s.basili]}>
                   <View style={s.kartUst}>
-                    <View style={[s.emojiKutu, item.tur === 'kokteyl' && s.emojiKutuKokteyl]}>
-                      <Text style={s.kartEmoji}>{item.tur === 'kokteyl' ? '🍹' : '🍽️'}</Text>
-                    </View>
+                    {item.resim_url ? (
+                      <Image source={{ uri: item.resim_url }} style={s.kartResim} contentFit="cover" transition={200} />
+                    ) : (
+                      <View style={[s.emojiKutu, item.tur === 'kokteyl' && s.emojiKutuKokteyl]}>
+                        <Text style={s.kartEmoji}>{item.tur === 'kokteyl' ? '🍹' : '🍽️'}</Text>
+                      </View>
+                    )}
                     <View style={{ flex: 1 }}>
                       <Text style={s.kartBaslik}>{item.isim}</Text>
                       <Text style={s.kartAlt}>
@@ -122,6 +127,7 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   emojiKutuKokteyl: { backgroundColor: Renk.morSoft },
+  kartResim: { width: 48, height: 48, borderRadius: 16, backgroundColor: Renk.anaSoft },
   kartEmoji: { fontSize: 24 },
   kartBaslik: { fontSize: 16, fontWeight: '700', color: Renk.yazi },
   kartAlt: { fontSize: 13, color: Renk.soluk, marginTop: 2 },

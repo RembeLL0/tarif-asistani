@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -39,13 +40,29 @@ export default function TarifDetay() {
     <ScrollView style={s.kap} contentContainerStyle={s.icerik}>
       <Stack.Screen options={{ title: '' }} />
 
-      <LinearGradient
-        colors={kokteyl ? Gradyan.patlican : Gradyan.ana}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[s.kapak, golge]}
-      >
-        <Text style={s.kapakEmoji}>{kokteyl ? '🍹' : '🥘'}</Text>
+      <View style={[s.kapak, golge]}>
+        {tarif.resim_url ? (
+          <>
+            <Image
+              source={{ uri: tarif.resim_url }}
+              style={StyleSheet.absoluteFill}
+              contentFit="cover"
+              transition={250}
+            />
+            <LinearGradient
+              colors={['rgba(0,0,0,0.05)', 'rgba(0,0,0,0.78)']}
+              style={StyleSheet.absoluteFill}
+            />
+          </>
+        ) : (
+          <LinearGradient
+            colors={kokteyl ? Gradyan.patlican : Gradyan.ana}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+        )}
+        {!tarif.resim_url && <Text style={s.kapakEmoji}>{kokteyl ? '🍹' : '🥘'}</Text>}
         <Text style={s.kapakBaslik}>{tarif.isim}</Text>
         <View style={s.etiketler}>
           <View style={s.etiket}>
@@ -58,7 +75,7 @@ export default function TarifDetay() {
             <Text style={s.etiketYazi}>{tarif.kategori}</Text>
           </View>
         </View>
-      </LinearGradient>
+      </View>
 
       <View style={s.malzemeBaslikSatir}>
         <Text style={s.bolumBaslik}>🧾 Malzemeler</Text>
@@ -119,7 +136,10 @@ const s = StyleSheet.create({
     borderRadius: 26,
     padding: 24,
     paddingTop: 84,
+    minHeight: 280,
     alignItems: 'center',
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
     marginBottom: 24,
   },
   kapakEmoji: { fontSize: 64 },
