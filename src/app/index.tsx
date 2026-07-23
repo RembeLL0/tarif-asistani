@@ -61,14 +61,21 @@ export default function AnaEkran() {
               <Text style={s.baslik}>
                 Bugün ne{'\n'}pişiriyoruz? <Text style={s.baslikEmoji}>🍳</Text>
               </Text>
-              {menu.length > 0 && (
-                <Pressable style={s.menuBtn} onPress={() => setMenuAcik(true)}>
-                  <Text style={s.menuBtnYazi}>🍽️ Menüm</Text>
-                  <View style={s.menuRozet}>
-                    <Text style={s.menuRozetYazi}>{menu.length}</Text>
-                  </View>
-                </Pressable>
-              )}
+              <Pressable
+                style={s.menuBtn}
+                onPress={() => (menu.length > 0 ? setMenuAcik(true) : router.push('/malzeme-sec'))}
+              >
+                {menu.length > 0 ? (
+                  <>
+                    <Text style={s.menuBtnYazi}>🍽️ Menüm</Text>
+                    <View style={s.menuRozet}>
+                      <Text style={s.menuRozetYazi}>{menu.length}</Text>
+                    </View>
+                  </>
+                ) : (
+                  <Text style={s.menuBtnYazi}>＋ Menü oluştur</Text>
+                )}
+              </Pressable>
             </View>
 
             <Pressable onPress={() => router.push('/malzeme-sec')}>
