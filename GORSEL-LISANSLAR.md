@@ -200,3 +200,13 @@ source URL below for the specific license and author.
 | Lokum | assets/tarifler/lokum.jpg | https://commons.wikimedia.org/wiki/File:Turkish_delight_from_Istanbul.jpg |
 | Pişmaniye | assets/tarifler/pismaniye.jpg | https://commons.wikimedia.org/wiki/File:Pismaniye_1_(Piotr_Kuczynski).jpg |
 | Pestil | assets/tarifler/pestil.jpg | https://commons.wikimedia.org/wiki/File:Pestil.jpg |
+| Kelle Paça Çorbası | assets/tarifler/kelle-paca.jpg | https://commons.wikimedia.org/wiki/File:Kelle_paça_çorbası_-_head_and_leg_soup.jpg |
+| Toyga Çorbası | assets/tarifler/toyga-corbasi.jpg | https://commons.wikimedia.org/wiki/File:Toyga.jpg |
+| Kuzu Tandır | assets/tarifler/kuzu-tandir.jpg | https://commons.wikimedia.org/wiki/File:Kuzu-kuyu.jpg |
+| Etli Bamya | assets/tarifler/etli-bamya.jpg | https://commons.wikimedia.org/wiki/File:Bamya_yemegi.jpg |
+| Etli Nohut | assets/tarifler/etli-nohut.jpg | https://commons.wikimedia.org/wiki/File:Nohut_yahni.jpg |
+| Kalamar Tava | assets/tarifler/kalamar-tava.jpg | https://commons.wikimedia.org/wiki/File:Kalamar_tava,_Turkish_style_fried_calamari.jpg |
+| Patlıcan Kızartması | assets/tarifler/patlican-kizartmasi.jpg | https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Fried_Eggplant_Slices.jpg |
+| Domatesli Pilav | assets/tarifler/domatesli-pilav.jpg | https://commons.wikimedia.org/wiki/File:Domatesli_pilav_from_Turkey.jpg |
+| Peynirli Pide | assets/tarifler/peynirli-pide.jpg | https://commons.wikimedia.org/wiki/File:Peynirli_Pide.jpg |
+| İncir Reçeli | assets/tarifler/incir-receli.jpg | https://commons.wikimedia.org/wiki/File:Fig_jam_on_a_dish.JPG |

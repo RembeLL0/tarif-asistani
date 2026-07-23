@@ -109,6 +109,7 @@ export const MALZEMELER: [string, string][] = [
   ['Kuru Bakla', 'Bakliyat & Tahıl'],
   ['Bulgur', 'Bakliyat & Tahıl'],
   ['İnce Bulgur', 'Bakliyat & Tahıl'],
+  ['Buğday', 'Bakliyat & Tahıl'],
   ['Pirinç', 'Bakliyat & Tahıl'],
   ['Un', 'Bakliyat & Tahıl'],
   ['Mısır Unu', 'Bakliyat & Tahıl'],

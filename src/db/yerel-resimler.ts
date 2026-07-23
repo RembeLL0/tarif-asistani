@@ -5,6 +5,17 @@
 import { type ImageSourcePropType } from 'react-native';
 
 export const YEREL_RESIM: Record<string, ImageSourcePropType> = {
+  // ─── Commons aramasıyla eklenen tarifler (seed-turk-6) ───
+  'Kelle Paça Çorbası': require('../../assets/tarifler/kelle-paca.jpg'),
+  'Toyga Çorbası': require('../../assets/tarifler/toyga-corbasi.jpg'),
+  'Kuzu Tandır': require('../../assets/tarifler/kuzu-tandir.jpg'),
+  'Etli Bamya': require('../../assets/tarifler/etli-bamya.jpg'),
+  'Etli Nohut': require('../../assets/tarifler/etli-nohut.jpg'),
+  'Kalamar Tava': require('../../assets/tarifler/kalamar-tava.jpg'),
+  'Patlıcan Kızartması': require('../../assets/tarifler/patlican-kizartmasi.jpg'),
+  'Domatesli Pilav': require('../../assets/tarifler/domatesli-pilav.jpg'),
+  'Peynirli Pide': require('../../assets/tarifler/peynirli-pide.jpg'),
+  'İncir Reçeli': require('../../assets/tarifler/incir-receli.jpg'),
   // ─── Reçel, turşu ve klasik tarifler (seed-turk-5) ───
   'Vişne Reçeli': require('../../assets/tarifler/visne-receli.jpg'),
   'Çilek Reçeli': require('../../assets/tarifler/cilek-receli.jpg'),

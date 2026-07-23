@@ -22,5 +22,6 @@ import { TURK_2 } from './seed-turk-2';
 import { TURK_3 } from './seed-turk-3';
 import { TURK_4 } from './seed-turk-4';
 import { TURK_5 } from './seed-turk-5';
+import { TURK_6 } from './seed-turk-6';
 
-export const TURK_TARIFLERI: SeedTarif[] = [...TURK_1, ...TURK_2, ...TURK_3, ...TURK_4, ...TURK_5];
+export const TURK_TARIFLERI: SeedTarif[] = [...TURK_1, ...TURK_2, ...TURK_3, ...TURK_4, ...TURK_5, ...TURK_6];
