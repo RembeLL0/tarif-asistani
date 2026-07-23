@@ -136,3 +136,22 @@ source URL below for the specific license and author.
 | İçli Köfte (Haşlama) | assets/tarifler/icli-kofte-haslama.jpg | https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Kibbeh3.jpg/500px-Kibbeh3.jpg |
 | Şehriyeli Tavuk Çorbası | assets/tarifler/sehriyeli-tavuk-corbasi.jpg | https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Chicken_Noodle_Soup.jpg/500px-Chicken_Noodle_Soup.jpg |
 | Şekerpare | assets/tarifler/sekerpare.jpg | https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Sheqerpare_me_bajame.JPG/500px-Sheqerpare_me_bajame.JPG |
+| İşkembe Çorbası | assets/tarifler/iskembe-corbasi.jpg | https://tr.wikipedia.org/wiki/İşkembe_çorbası (Wikimedia Commons) |
+| Fava | assets/tarifler/fava.jpg | https://tr.wikipedia.org/wiki/Fava (Wikimedia Commons) |
+| Humus | assets/tarifler/humus.jpg | https://commons.wikimedia.org/wiki/File:Lebanese_style_hummus.jpg |
+| Babagannuş | assets/tarifler/babagannus.jpg | https://en.wikipedia.org/wiki/Baba_ghanoush (Wikimedia Commons) |
+| Şakşuka | assets/tarifler/saksuka.jpg | https://tr.wikipedia.org/wiki/Şakşuka (Wikimedia Commons) |
+| Muhammara | assets/tarifler/muhammara.jpg | https://en.wikipedia.org/wiki/Muhammara (Wikimedia Commons) |
+| Rus Salatası | assets/tarifler/rus-salatasi.jpg | https://commons.wikimedia.org/wiki/File:Салат_Оливье_03.jpg |
+| İnegöl Köfte | assets/tarifler/inegol-kofte.jpg | https://commons.wikimedia.org/wiki/File:İnegöl_köfte.jpg |
+| Arnavut Ciğeri | assets/tarifler/arnavut-cigeri.jpg | https://commons.wikimedia.org/wiki/File:Albanian_liver.jpg |
+| Sac Kavurma | assets/tarifler/sac-kavurma.jpg | https://commons.wikimedia.org/wiki/File:Kavurma_closeup.jpg |
+| Midye Dolma | assets/tarifler/midye-dolma.jpg | https://commons.wikimedia.org/wiki/File:Midye_dolma_(6).JPG |
+| Hamsili Pilav | assets/tarifler/hamsili-pilav.jpg | https://commons.wikimedia.org/wiki/File:Hamsili_pilav_-_Flickr_-_gulinvardar.jpg |
+| Çiğ Börek | assets/tarifler/cig-borek.jpg | https://commons.wikimedia.org/wiki/File:Ayran%2BÇibörek.jpg |
+| Simit | assets/tarifler/simit.jpg | https://commons.wikimedia.org/wiki/File:Simit,_Istanbul,_Turkey_(49579014147).jpg |
+| Kol Böreği | assets/tarifler/kol-boregi.jpg | https://commons.wikimedia.org/wiki/File:Motani_burek_1.gif |
+| Ekmek Kadayıfı | assets/tarifler/ekmek-kadayifi.jpg | https://commons.wikimedia.org/wiki/File:Vişneli_ekmek_kadayıfı_-_Ankara.jpg |
+| Kalburabastı | assets/tarifler/kalburabasti.jpg | https://commons.wikimedia.org/wiki/File:Tulumba_and_more.jpg |
+| Zerde | assets/tarifler/zerde.jpg | https://commons.wikimedia.org/wiki/File:Zerde.jpg |
+| Cezerye | assets/tarifler/cezerye.jpg | https://commons.wikimedia.org/wiki/File:Cezerye.jpg |

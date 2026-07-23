@@ -5,6 +5,26 @@
 import { type ImageSourcePropType } from 'react-native';
 
 export const YEREL_RESIM: Record<string, ImageSourcePropType> = {
+  // ─── Sonradan eklenen Türk tarifleri (seed-turk-4) ───
+  'İşkembe Çorbası': require('../../assets/tarifler/iskembe-corbasi.jpg'),
+  'Fava': require('../../assets/tarifler/fava.jpg'),
+  'Humus': require('../../assets/tarifler/humus.jpg'),
+  'Babagannuş': require('../../assets/tarifler/babagannus.jpg'),
+  'Şakşuka': require('../../assets/tarifler/saksuka.jpg'),
+  'Muhammara': require('../../assets/tarifler/muhammara.jpg'),
+  'Rus Salatası': require('../../assets/tarifler/rus-salatasi.jpg'),
+  'İnegöl Köfte': require('../../assets/tarifler/inegol-kofte.jpg'),
+  'Arnavut Ciğeri': require('../../assets/tarifler/arnavut-cigeri.jpg'),
+  'Sac Kavurma': require('../../assets/tarifler/sac-kavurma.jpg'),
+  'Midye Dolma': require('../../assets/tarifler/midye-dolma.jpg'),
+  'Hamsili Pilav': require('../../assets/tarifler/hamsili-pilav.jpg'),
+  'Çiğ Börek': require('../../assets/tarifler/cig-borek.jpg'),
+  'Simit': require('../../assets/tarifler/simit.jpg'),
+  'Kol Böreği': require('../../assets/tarifler/kol-boregi.jpg'),
+  'Ekmek Kadayıfı': require('../../assets/tarifler/ekmek-kadayifi.jpg'),
+  'Kalburabastı': require('../../assets/tarifler/kalburabasti.jpg'),
+  'Zerde': require('../../assets/tarifler/zerde.jpg'),
+  'Cezerye': require('../../assets/tarifler/cezerye.jpg'),
   'Adana Kebap (Tava Usulü)': require('../../assets/tarifler/adana-kebap-tava-usulu.jpg'),
   'Ali Nazik': require('../../assets/tarifler/ali-nazik.jpg'),
   'Asya Usulü Tavuk Dürüm': require('../../assets/tarifler/asya-usulu-tavuk-durum.jpg'),

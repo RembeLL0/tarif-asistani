@@ -20,5 +20,6 @@ export interface SeedTarif {
 import { TURK_1 } from './seed-turk-1';
 import { TURK_2 } from './seed-turk-2';
 import { TURK_3 } from './seed-turk-3';
+import { TURK_4 } from './seed-turk-4';
 
-export const TURK_TARIFLERI: SeedTarif[] = [...TURK_1, ...TURK_2, ...TURK_3];
+export const TURK_TARIFLERI: SeedTarif[] = [...TURK_1, ...TURK_2, ...TURK_3, ...TURK_4];

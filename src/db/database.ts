@@ -7,7 +7,7 @@ import { KOKTEYL_TARIFLERI } from './seed-kokteyller';
 
 // Seed verisi değiştiğinde bu sürümü artırın; uygulama açılışta
 // veritabanını yeni veriyle baştan kurar.
-const SEMA_SURUMU = 7;
+const SEMA_SURUMU = 8;
 
 export interface Mutfak {
   id: number;

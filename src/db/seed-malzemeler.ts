@@ -54,6 +54,7 @@ export const MALZEMELER: [string, string][] = [
   ['Semizotu', 'Sebze & Meyve'],
   ['Asma Yaprağı', 'Sebze & Meyve'],
   ['Kuru Soğan (Arpacık)', 'Sebze & Meyve'],
+  ['Kornişon Turşu', 'Sebze & Meyve'],
 
   // Et, Tavuk & Balık
   ['Kıyma', 'Et, Tavuk & Balık'],
@@ -70,6 +71,10 @@ export const MALZEMELER: [string, string][] = [
   ['Sucuk', 'Et, Tavuk & Balık'],
   ['Pastırma', 'Et, Tavuk & Balık'],
   ['Ton Balığı', 'Et, Tavuk & Balık'],
+  ['İşkembe', 'Et, Tavuk & Balık'],
+  ['Kuzu Ciğeri', 'Et, Tavuk & Balık'],
+  ['Midye', 'Et, Tavuk & Balık'],
+  ['Kalamar', 'Et, Tavuk & Balık'],
 
   // Süt Ürünleri & Yumurta
   ['Yumurta', 'Süt Ürünleri & Yumurta'],
@@ -93,6 +98,7 @@ export const MALZEMELER: [string, string][] = [
   ['Nohut', 'Bakliyat & Tahıl'],
   ['Kuru Fasulye', 'Bakliyat & Tahıl'],
   ['Barbunya', 'Bakliyat & Tahıl'],
+  ['Kuru Bakla', 'Bakliyat & Tahıl'],
   ['Bulgur', 'Bakliyat & Tahıl'],
   ['İnce Bulgur', 'Bakliyat & Tahıl'],
   ['Pirinç', 'Bakliyat & Tahıl'],
@@ -107,6 +113,7 @@ export const MALZEMELER: [string, string][] = [
   ['Yufka', 'Bakliyat & Tahıl'],
   ['Baklavalık Yufka', 'Bakliyat & Tahıl'],
   ['Kadayıf', 'Bakliyat & Tahıl'],
+  ['Ekmek Kadayıfı', 'Bakliyat & Tahıl'],
   ['Güllaç Yaprağı', 'Bakliyat & Tahıl'],
   ['Lavaş', 'Bakliyat & Tahıl'],
   ['Ekmek', 'Bakliyat & Tahıl'],
@@ -155,6 +162,7 @@ export const MALZEMELER: [string, string][] = [
   ['Pudra Şekeri', 'Pastacılık & Kuruyemiş'],
   ['Vanilya', 'Pastacılık & Kuruyemiş'],
   ['Kabartma Tozu', 'Pastacılık & Kuruyemiş'],
+  ['Karbonat', 'Pastacılık & Kuruyemiş'],
   ['Maya', 'Pastacılık & Kuruyemiş'],
   ['Nişasta', 'Pastacılık & Kuruyemiş'],
   ['Kakao', 'Pastacılık & Kuruyemiş'],
