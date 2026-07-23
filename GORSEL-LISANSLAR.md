@@ -155,3 +155,48 @@ source URL below for the specific license and author.
 | Kalburabastı | assets/tarifler/kalburabasti.jpg | https://commons.wikimedia.org/wiki/File:Tulumba_and_more.jpg |
 | Zerde | assets/tarifler/zerde.jpg | https://commons.wikimedia.org/wiki/File:Zerde.jpg |
 | Cezerye | assets/tarifler/cezerye.jpg | https://commons.wikimedia.org/wiki/File:Cezerye.jpg |
+| Vişne Reçeli | assets/tarifler/visne-receli.jpg | https://commons.wikimedia.org/wiki/File:Cherry_muraba.jpg |
+| Çilek Reçeli | assets/tarifler/cilek-receli.jpg | https://commons.wikimedia.org/wiki/File:Az-Strawberry_jam,_making_by_e-citizen_(moonsun1981).JPG |
+| Kayısı Reçeli | assets/tarifler/kayisi-receli.jpg | https://commons.wikimedia.org/wiki/File:Kayısı_reçeli.jpg |
+| Gül Reçeli | assets/tarifler/gul-receli.jpg | https://commons.wikimedia.org/wiki/File:Rose_petals_jam.jpg |
+| Portakal Marmelatı | assets/tarifler/portakal-marmelati.jpg | https://commons.wikimedia.org/wiki/File:Marmalade_spread_on_bread.jpg |
+| Ayva Reçeli | assets/tarifler/ayva-receli.jpg | https://commons.wikimedia.org/wiki/File:Ayva_reçeli_in_a_jar.jpg |
+| Karışık Turşu | assets/tarifler/karisik-tursu.jpg | https://commons.wikimedia.org/wiki/File:Pickled_Preserves_for_Sale_-_Beyoglu_District_-_Istanbul_-_Turkey_(5719101647).jpg |
+| Salatalık Turşusu | assets/tarifler/salatalik-tursusu.jpg | https://commons.wikimedia.org/wiki/File:Weihnachts_Gurke.jpg |
+| Beyran | assets/tarifler/beyran.jpg | https://commons.wikimedia.org/wiki/File:Beyran_again.jpg |
+| Analı Kızlı | assets/tarifler/analikizli.jpg | https://commons.wikimedia.org/wiki/File:Analı_Kızlı_Köfte.jpg |
+| Balık Çorbası | assets/tarifler/balik-corbasi.jpg | https://commons.wikimedia.org/wiki/File:Balık_çorbasi.jpg |
+| Mıhlama | assets/tarifler/mihlama.jpg | https://commons.wikimedia.org/wiki/File:Rize_Muhlaması.jpg |
+| Kaygana | assets/tarifler/kaygana.jpg | https://commons.wikimedia.org/wiki/File:Kaygana.jpg |
+| Sahanda Yumurta | assets/tarifler/sahanda-yumurta.jpg | https://commons.wikimedia.org/wiki/File:Flickr_-_cyclonebill_-_Vagtel-spejlæg.jpg |
+| Girit Ezmesi | assets/tarifler/girit-ezmesi.jpg | https://commons.wikimedia.org/wiki/File:Tirokafteri.jpg |
+| Urfa Kebabı | assets/tarifler/urfa-kebabi.jpg | https://commons.wikimedia.org/wiki/File:Urfa_kebap.jpg |
+| Beyti Kebap | assets/tarifler/beyti.jpg | https://commons.wikimedia.org/wiki/File:Beyti_in_a_tray_at_Ankara.jpg |
+| Testi Kebabı | assets/tarifler/testi-kebabi.jpg | https://commons.wikimedia.org/wiki/File:TestiKebabGoreme.jpg |
+| Çökertme Kebabı | assets/tarifler/cokertme-kebabi.jpg | https://commons.wikimedia.org/wiki/File:Çökertme_kebabı_(cropped).jpg |
+| Kağıt Kebabı | assets/tarifler/kagit-kebabi.jpg | https://commons.wikimedia.org/wiki/File:Kagıt_kebabı.jpg |
+| Çöp Şiş | assets/tarifler/cop-sis.jpg | https://commons.wikimedia.org/wiki/File:Çöp_şiş_(kuzu).jpg |
+| Tekirdağ Köftesi | assets/tarifler/tekirdag-kofte.jpg | https://commons.wikimedia.org/wiki/File:TekirdağKofte.JPG |
+| Papaz Yahnisi | assets/tarifler/papaz-yahnisi.jpg | https://commons.wikimedia.org/wiki/File:Papaz_yahnisi_-_1.jpg |
+| Şiş Köfte | assets/tarifler/sis-kofte.jpg | https://commons.wikimedia.org/wiki/File:Delicious_dinner.JPG |
+| Elbasan Tava | assets/tarifler/elbasan-tava.jpg | https://commons.wikimedia.org/wiki/File:Elbasan_tava.jpg |
+| Patlıcan Kebabı | assets/tarifler/patlican-kebabi.jpg | https://commons.wikimedia.org/wiki/File:Patlıcan_kebap.jpg |
+| Manisa Kebabı | assets/tarifler/manisa-kebabi.jpg | https://commons.wikimedia.org/wiki/File:Kebab_of_Manisa.jpg |
+| Tavuk Döner | assets/tarifler/tavuk-doner.jpg | https://commons.wikimedia.org/wiki/File:Döner_kebab_slicing.jpg |
+| Çıtır Tavuk | assets/tarifler/citir-tavuk.jpg | https://commons.wikimedia.org/wiki/File:Fried-Chicken-Set.jpg |
+| Balık Ekmek | assets/tarifler/balik-ekmek.jpg | https://commons.wikimedia.org/wiki/File:Fish_sandwich,_Istanbul,_Turkey.JPG |
+| Midye Tava | assets/tarifler/midye-tava.jpg | https://commons.wikimedia.org/wiki/File:Fried_mussels_in_Ankara.jpg |
+| Perde Pilavı | assets/tarifler/perde-pilavi.jpg | https://commons.wikimedia.org/wiki/File:Perde_pilav.jpg |
+| Etli Ekmek | assets/tarifler/etli-ekmek.jpg | https://commons.wikimedia.org/wiki/File:Etliekmek.jpg |
+| Ramazan Pidesi | assets/tarifler/ramazan-pidesi.jpg | https://commons.wikimedia.org/wiki/File:RamazanPidesi.jpg |
+| Boyoz | assets/tarifler/boyoz.jpg | https://commons.wikimedia.org/wiki/File:Boyoz_gösterim.jpg |
+| Kete | assets/tarifler/kete.jpg | https://commons.wikimedia.org/wiki/File:Baked_kete_photo.jpg |
+| Tel Kadayıf | assets/tarifler/tel-kadayif.jpg | https://commons.wikimedia.org/wiki/File:Burma_kadayif.jpg |
+| Şöbiyet | assets/tarifler/sobiyet.jpg | https://commons.wikimedia.org/wiki/File:Şöbiyet_Baklava.jpg |
+| Un Helvası | assets/tarifler/un-helvasi.jpg | https://commons.wikimedia.org/wiki/File:UnHelvasi.jpg |
+| Kemalpaşa Tatlısı | assets/tarifler/kemalpasa-tatlisi.jpg | https://commons.wikimedia.org/wiki/File:Kemalpaşa.jpg |
+| Bülbül Yuvası | assets/tarifler/bulbul-yuvasi.jpg | https://commons.wikimedia.org/wiki/File:Bulbulyuvasi,_Turkish_dessert.jpg |
+| Profiterol | assets/tarifler/profiterol.jpg | https://commons.wikimedia.org/wiki/File:Chou_chocolat.JPG |
+| Lokum | assets/tarifler/lokum.jpg | https://commons.wikimedia.org/wiki/File:Turkish_delight_from_Istanbul.jpg |
+| Pişmaniye | assets/tarifler/pismaniye.jpg | https://commons.wikimedia.org/wiki/File:Pismaniye_1_(Piotr_Kuczynski).jpg |
+| Pestil | assets/tarifler/pestil.jpg | https://commons.wikimedia.org/wiki/File:Pestil.jpg |

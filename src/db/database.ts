@@ -7,7 +7,7 @@ import { KOKTEYL_TARIFLERI } from './seed-kokteyller';
 
 // Seed verisi değiştiğinde bu sürümü artırın; uygulama açılışta
 // veritabanını yeni veriyle baştan kurar.
-const SEMA_SURUMU = 8;
+const SEMA_SURUMU = 9;
 
 export interface Mutfak {
   id: number;
@@ -213,7 +213,10 @@ export function kursGrubu(kategori: string, tur: string): KursAnahtar {
   if (k.includes('içecek') || k.includes('kokteyl')) return 'icecek';
   if (k.includes('çorba')) return 'corba';
   if (k.includes('tatlı')) return 'tatli';
-  if (k.includes('meze') || k.includes('salata') || k.includes('zeytinyağ') || k.includes('kahvalt'))
+  if (
+    k.includes('meze') || k.includes('salata') || k.includes('zeytinyağ') || k.includes('kahvalt') ||
+    k.includes('turşu') || k.includes('reçel') || k.includes('marmelat') || k.includes('konserve')
+  )
     return 'meze';
   if (k.includes('hamur') || k.includes('börek') || k.includes('poğaça')) return 'arasicak';
   return 'ana';
