@@ -1,18 +1,44 @@
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { golge, Renk } from '@/constants/renkler';
 import { malzemeyeGoreTarifBul, type EslesenTarif } from '@/db/database';
 import { YEREL_RESIM } from '@/db/yerel-resimler';
 
+type FiltreAnahtar = 'hepsi' | 'corba' | 'arasicak' | 'ana' | 'meze' | 'tatli' | 'icecek';
+
+const FILTRELER: { anahtar: FiltreAnahtar; etiket: string }[] = [
+  { anahtar: 'hepsi', etiket: 'Tümü' },
+  { anahtar: 'corba', etiket: 'Çorba' },
+  { anahtar: 'arasicak', etiket: 'Ara Sıcak' },
+  { anahtar: 'ana', etiket: 'Ana Yemek' },
+  { anahtar: 'meze', etiket: 'Meze' },
+  { anahtar: 'tatli', etiket: 'Tatlı' },
+  { anahtar: 'icecek', etiket: 'İçecek' },
+];
+
+// Tarifin kategorisini kullanıcıya gösterilen 6 gruptan birine eşler.
+function tarifGrubu(t: EslesenTarif): Exclude<FiltreAnahtar, 'hepsi'> {
+  if (t.tur === 'kokteyl') return 'icecek';
+  const k = t.kategori.toLocaleLowerCase('tr');
+  if (k.includes('içecek') || k.includes('kokteyl')) return 'icecek';
+  if (k.includes('çorba')) return 'corba';
+  if (k.includes('tatlı')) return 'tatli';
+  if (k.includes('meze') || k.includes('salata') || k.includes('zeytinyağ') || k.includes('kahvalt'))
+    return 'meze';
+  if (k.includes('hamur') || k.includes('börek') || k.includes('poğaça')) return 'arasicak';
+  return 'ana';
+}
+
 export default function Sonuclar() {
   const { ids } = useLocalSearchParams<{ ids: string }>();
   const db = useSQLiteContext();
   const router = useRouter();
   const [sonuclar, setSonuclar] = useState<EslesenTarif[] | null>(null);
+  const [filtre, setFiltre] = useState<FiltreAnahtar>('hepsi');
 
   useEffect(() => {
     const malzemeIds = (ids ?? '')
@@ -22,29 +48,57 @@ export default function Sonuclar() {
     malzemeyeGoreTarifBul(db, malzemeIds).then(setSonuclar);
   }, [db, ids]);
 
+  // Hangi grupların sonuçta gerçekten karşılığı var? Sadece onları çip olarak göster.
+  const mevcutGruplar = useMemo(() => {
+    const set = new Set<FiltreAnahtar>();
+    (sonuclar ?? []).forEach((t) => set.add(tarifGrubu(t)));
+    return set;
+  }, [sonuclar]);
+
   if (sonuclar === null) return null;
 
-  const tamSayisi = sonuclar.filter((t) => t.eksikler.length === 0).length;
+  const listelenen =
+    filtre === 'hepsi' ? sonuclar : sonuclar.filter((t) => tarifGrubu(t) === filtre);
+  const tamSayisi = listelenen.filter((t) => t.eksikler.length === 0).length;
+  const cipler = FILTRELER.filter((f) => f.anahtar === 'hepsi' || mevcutGruplar.has(f.anahtar));
 
   return (
     <View style={s.kap}>
+      {sonuclar.length > 0 && (
+        <View style={s.baslikAlan}>
+          <Text style={s.ozet}>
+            <Text style={s.ozetVurgu}>{listelenen.length} tarif</Text> bulundu
+            {tamSayisi > 0 && (
+              <Text>
+                {' '}
+                — <Text style={s.ozetYesil}>{tamSayisi} tanesi için her şey hazır ✓</Text>
+              </Text>
+            )}
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={s.cipSerit}
+          >
+            {cipler.map((f) => {
+              const aktif = filtre === f.anahtar;
+              return (
+                <Pressable
+                  key={f.anahtar}
+                  onPress={() => setFiltre(f.anahtar)}
+                  style={[s.cip, aktif && s.cipAktif]}
+                >
+                  <Text style={[s.cipYazi, aktif && s.cipYaziAktif]}>{f.etiket}</Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </View>
+      )}
       <FlatList
-        data={sonuclar}
+        data={listelenen}
         keyExtractor={(t) => String(t.id)}
         contentContainerStyle={s.liste}
-        ListHeaderComponent={
-          sonuclar.length > 0 ? (
-            <Text style={s.ozet}>
-              <Text style={s.ozetVurgu}>{sonuclar.length} tarif</Text> bulundu
-              {tamSayisi > 0 && (
-                <Text>
-                  {' '}
-                  — <Text style={s.ozetYesil}>{tamSayisi} tanesi için her şey hazır ✓</Text>
-                </Text>
-              )}
-            </Text>
-          ) : null
-        }
         ListEmptyComponent={
           <View style={s.bos}>
             <Text style={s.bosEmoji}>🤷</Text>
@@ -107,8 +161,21 @@ export default function Sonuclar() {
 
 const s = StyleSheet.create({
   kap: { flex: 1, backgroundColor: Renk.arka },
-  liste: { padding: 20, flexGrow: 1 },
+  baslikAlan: { paddingTop: 20, paddingHorizontal: 20 },
+  liste: { padding: 20, paddingTop: 14, flexGrow: 1 },
   ozet: { fontSize: 15, color: Renk.soluk, marginBottom: 14, fontWeight: '500' },
+  cipSerit: { gap: 8, paddingRight: 20 },
+  cip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: Renk.kart,
+    borderWidth: 1,
+    borderColor: Renk.cizgi,
+  },
+  cipAktif: { backgroundColor: Renk.ana, borderColor: Renk.ana },
+  cipYazi: { fontSize: 13, fontWeight: '700', color: Renk.soluk },
+  cipYaziAktif: { color: Renk.arka },
   ozetVurgu: { color: Renk.yazi, fontWeight: '800' },
   ozetYesil: { color: Renk.yesil, fontWeight: '700' },
   kart: {
