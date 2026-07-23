@@ -1,11 +1,13 @@
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 
+import { MenuModal } from '@/components/MenuModal';
 import { golge, Renk } from '@/constants/renkler';
-import { malzemeyeGoreTarifBul, type EslesenTarif } from '@/db/database';
+import { useMenu, type MenuTarif } from '@/context/menu';
+import { kursGrubu, malzemeyeGoreTarifBul, type EslesenTarif } from '@/db/database';
 import { YEREL_RESIM } from '@/db/yerel-resimler';
 
 type FiltreAnahtar = 'hepsi' | 'corba' | 'arasicak' | 'ana' | 'meze' | 'tatli' | 'icecek';
@@ -20,37 +22,23 @@ const FILTRELER: { anahtar: FiltreAnahtar; etiket: string }[] = [
   { anahtar: 'icecek', etiket: 'İçecek' },
 ];
 
-// Tarifin kategorisini kullanıcıya gösterilen 6 gruptan birine eşler.
-function tarifGrubu(t: EslesenTarif): Exclude<FiltreAnahtar, 'hepsi'> {
-  if (t.tur === 'kokteyl') return 'icecek';
-  const k = t.kategori.toLocaleLowerCase('tr');
-  if (k.includes('içecek') || k.includes('kokteyl')) return 'icecek';
-  if (k.includes('çorba')) return 'corba';
-  if (k.includes('tatlı')) return 'tatli';
-  if (k.includes('meze') || k.includes('salata') || k.includes('zeytinyağ') || k.includes('kahvalt'))
-    return 'meze';
-  if (k.includes('hamur') || k.includes('börek') || k.includes('poğaça')) return 'arasicak';
-  return 'ana';
-}
-
-// Menüde kursların gösterim sırası ve etiketleri.
-const KURS_SIRA: { anahtar: Exclude<FiltreAnahtar, 'hepsi'>; etiket: string }[] = [
-  { anahtar: 'corba', etiket: 'Çorba' },
-  { anahtar: 'arasicak', etiket: 'Ara Sıcak' },
-  { anahtar: 'ana', etiket: 'Ana Yemek' },
-  { anahtar: 'meze', etiket: 'Meze' },
-  { anahtar: 'tatli', etiket: 'Tatlı' },
-  { anahtar: 'icecek', etiket: 'İçecek' },
-];
+const menuTarifYap = (t: EslesenTarif): MenuTarif => ({
+  id: t.id,
+  isim: t.isim,
+  mutfak: t.mutfak,
+  kategori: t.kategori,
+  sure_dk: t.sure_dk,
+  tur: t.tur,
+});
 
 export default function Sonuclar() {
   const { ids } = useLocalSearchParams<{ ids: string }>();
   const db = useSQLiteContext();
   const router = useRouter();
+  const { menu, iceriyorMu, degistir } = useMenu();
   const [sonuclar, setSonuclar] = useState<EslesenTarif[] | null>(null);
   const [filtre, setFiltre] = useState<FiltreAnahtar>('hepsi');
   const [menuModu, setMenuModu] = useState(false);
-  const [secili, setSecili] = useState<Set<number>>(new Set());
   const [menuAcik, setMenuAcik] = useState(false);
 
   useEffect(() => {
@@ -64,38 +52,23 @@ export default function Sonuclar() {
   // Hangi grupların sonuçta gerçekten karşılığı var? Sadece onları çip olarak göster.
   const mevcutGruplar = useMemo(() => {
     const set = new Set<FiltreAnahtar>();
-    (sonuclar ?? []).forEach((t) => set.add(tarifGrubu(t)));
+    (sonuclar ?? []).forEach((t) => set.add(kursGrubu(t.kategori, t.tur)));
     return set;
   }, [sonuclar]);
 
-  const tarifSec = (id: number) =>
-    setSecili((onceki) => {
-      const yeni = new Set(onceki);
-      if (yeni.has(id)) yeni.delete(id);
-      else yeni.add(id);
-      return yeni;
-    });
-
-  const menuKapat = () => {
+  // Menü modundan çıkarken menüyü SİLMEZ; menü kalıcıdır (ana ekranda görünür).
+  const menuModunuBitir = () => {
     setMenuModu(false);
     setMenuAcik(false);
-    setSecili(new Set());
   };
 
   if (sonuclar === null) return null;
 
   const listelenen =
-    filtre === 'hepsi' ? sonuclar : sonuclar.filter((t) => tarifGrubu(t) === filtre);
+    filtre === 'hepsi' ? sonuclar : sonuclar.filter((t) => kursGrubu(t.kategori, t.tur) === filtre);
   const tamSayisi = listelenen.filter((t) => t.eksikler.length === 0).length;
   const cipler = FILTRELER.filter((f) => f.anahtar === 'hepsi' || mevcutGruplar.has(f.anahtar));
-
-  // Seçilen tarifleri kurslara göre grupla (menü penceresi için).
-  const seciliTarifler = sonuclar.filter((t) => secili.has(t.id));
-  const toplamSure = seciliTarifler.reduce((a, t) => a + (t.sure_dk ?? 0), 0);
-  const menuGruplari = KURS_SIRA.map((k) => ({
-    ...k,
-    tarifler: seciliTarifler.filter((t) => tarifGrubu(t) === k.anahtar),
-  })).filter((g) => g.tarifler.length > 0);
+  const menuSure = menu.reduce((a, t) => a + (t.sure_dk ?? 0), 0);
 
   return (
     <View style={s.kap}>
@@ -112,11 +85,11 @@ export default function Sonuclar() {
               )}
             </Text>
             <Pressable
-              onPress={() => (menuModu ? menuKapat() : setMenuModu(true))}
+              onPress={() => (menuModu ? menuModunuBitir() : setMenuModu(true))}
               style={[s.menuBtn, menuModu && s.menuBtnAktif]}
             >
               <Text style={[s.menuBtnYazi, menuModu && s.menuBtnYaziAktif]}>
-                {menuModu ? '✕ Vazgeç' : '＋ Menü oluştur'}
+                {menuModu ? '✓ Bitir' : '＋ Menü oluştur'}
               </Text>
             </Pressable>
           </View>
@@ -144,7 +117,7 @@ export default function Sonuclar() {
         data={listelenen}
         keyExtractor={(t) => String(t.id)}
         style={s.fl}
-        contentContainerStyle={[s.liste, menuModu && secili.size > 0 && s.listeBarli]}
+        contentContainerStyle={[s.liste, menuModu && menu.length > 0 && s.listeBarli]}
         ListEmptyComponent={
           <View style={s.bos}>
             <Text style={s.bosEmoji}>🤷</Text>
@@ -155,10 +128,12 @@ export default function Sonuclar() {
         renderItem={({ item }) => {
           const tam = item.eksikler.length === 0;
           const oran = item.eslesen / item.toplam;
-          const secildi = secili.has(item.id);
+          const secildi = iceriyorMu(item.id);
           return (
             <Pressable
-              onPress={() => (menuModu ? tarifSec(item.id) : router.push(`/tarif/${item.id}`))}
+              onPress={() =>
+                menuModu ? degistir(menuTarifYap(item)) : router.push(`/tarif/${item.id}`)
+              }
             >
               {({ pressed }) => (
                 <View
@@ -212,12 +187,12 @@ export default function Sonuclar() {
         }}
       />
 
-      {menuModu && secili.size > 0 && (
+      {menuModu && menu.length > 0 && (
         <View style={s.altBar}>
           <View>
             <Text style={s.altBarBaslik}>Menüm</Text>
             <Text style={s.altBarAlt}>
-              {secili.size} tarif · toplam ⏱ {toplamSure} dk
+              {menu.length} tarif · toplam ⏱ {menuSure} dk
             </Text>
           </View>
           <Pressable style={s.altBarBtn} onPress={() => setMenuAcik(true)}>
@@ -226,65 +201,7 @@ export default function Sonuclar() {
         </View>
       )}
 
-      <Modal visible={menuAcik} transparent animationType="slide" onRequestClose={() => setMenuAcik(false)}>
-        <View style={s.modalArka}>
-          <View style={s.modalKart}>
-            <View style={s.modalUst}>
-              <Text style={s.modalBaslik}>🍽️ Menüm</Text>
-              <Pressable onPress={() => setMenuAcik(false)} hitSlop={10}>
-                <Text style={s.modalKapat}>✕</Text>
-              </Pressable>
-            </View>
-            <Text style={s.modalOzet}>
-              {secili.size} tarif · toplam ⏱ {toplamSure} dk
-            </Text>
-
-            <ScrollView style={s.modalListe} contentContainerStyle={{ gap: 16 }}>
-              {menuGruplari.map((g) => (
-                <View key={g.anahtar} style={{ gap: 8 }}>
-                  <Text style={s.kursBaslik}>{g.etiket}</Text>
-                  {g.tarifler.map((t) => (
-                    <Pressable
-                      key={t.id}
-                      style={s.menuSatir}
-                      onPress={() => {
-                        setMenuAcik(false);
-                        router.push(`/tarif/${t.id}`);
-                      }}
-                    >
-                      {YEREL_RESIM[t.isim] ? (
-                        <Image source={YEREL_RESIM[t.isim]} style={s.menuResim} contentFit="cover" />
-                      ) : (
-                        <View style={[s.menuResim, s.menuResimBos]}>
-                          <Text style={{ fontSize: 18 }}>{t.tur === 'kokteyl' ? '🍹' : '🍽️'}</Text>
-                        </View>
-                      )}
-                      <View style={{ flex: 1 }}>
-                        <Text style={s.menuSatirBaslik}>{t.isim}</Text>
-                        <Text style={s.menuSatirAlt}>
-                          {t.mutfak} · ⏱ {t.sure_dk} dk
-                        </Text>
-                      </View>
-                      <Pressable onPress={() => tarifSec(t.id)} hitSlop={10}>
-                        <Text style={s.menuCikar}>✕</Text>
-                      </Pressable>
-                    </Pressable>
-                  ))}
-                </View>
-              ))}
-            </ScrollView>
-
-            <View style={s.modalAltButonlar}>
-              <Pressable style={s.modalTemizle} onPress={() => setSecili(new Set())}>
-                <Text style={s.modalTemizleYazi}>Menüyü temizle</Text>
-              </Pressable>
-              <Pressable style={s.modalBitir} onPress={menuKapat}>
-                <Text style={s.modalBitirYazi}>Tamam</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <MenuModal visible={menuAcik} onClose={() => setMenuAcik(false)} />
     </View>
   );
 }
@@ -406,54 +323,4 @@ const s = StyleSheet.create({
   altBarAlt: { fontSize: 12, color: Renk.soluk, marginTop: 2 },
   altBarBtn: { backgroundColor: Renk.ana, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 18 },
   altBarBtnYazi: { fontSize: 14, fontWeight: '800', color: Renk.arka },
-
-  modalArka: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' },
-  modalKart: {
-    backgroundColor: Renk.arka,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 24,
-    maxHeight: '85%',
-    borderTopWidth: 1,
-    borderColor: Renk.cizgi,
-  },
-  modalUst: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  modalBaslik: { fontSize: 20, fontWeight: '900', color: Renk.yazi },
-  modalKapat: { fontSize: 20, color: Renk.soluk, fontWeight: '700' },
-  modalOzet: { fontSize: 13, color: Renk.soluk, marginTop: 4, marginBottom: 14 },
-  modalListe: { flexGrow: 0 },
-  kursBaslik: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: Renk.ana,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  menuSatir: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: Renk.kart,
-    borderRadius: 16,
-    padding: 10,
-  },
-  menuResim: { width: 44, height: 44, borderRadius: 12, backgroundColor: Renk.anaSoft },
-  menuResimBos: { alignItems: 'center', justifyContent: 'center' },
-  menuSatirBaslik: { fontSize: 15, fontWeight: '700', color: Renk.yazi },
-  menuSatirAlt: { fontSize: 12, color: Renk.soluk, marginTop: 2 },
-  menuCikar: { fontSize: 16, color: Renk.soluk, fontWeight: '700', paddingHorizontal: 4 },
-  modalAltButonlar: { flexDirection: 'row', gap: 12, marginTop: 18 },
-  modalTemizle: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 14,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Renk.cizgi,
-  },
-  modalTemizleYazi: { fontSize: 14, fontWeight: '700', color: Renk.soluk },
-  modalBitir: { flex: 1, alignItems: 'center', paddingVertical: 14, borderRadius: 16, backgroundColor: Renk.ana },
-  modalBitirYazi: { fontSize: 14, fontWeight: '800', color: Renk.arka },
 });

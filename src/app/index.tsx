@@ -5,7 +5,9 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
 
+import { MenuModal } from '@/components/MenuModal';
 import { golge, Gradyan, MutfakGradyanlari, Renk } from '@/constants/renkler';
+import { useMenu } from '@/context/menu';
 import { getMutfaklar, type Mutfak } from '@/db/database';
 
 function mutfakEmoji(isim: string): string {
@@ -34,7 +36,9 @@ function mutfakGradyani(isim: string, index: number) {
 export default function AnaEkran() {
   const db = useSQLiteContext();
   const router = useRouter();
+  const { menu } = useMenu();
   const [mutfaklar, setMutfaklar] = useState<Mutfak[]>([]);
+  const [menuAcik, setMenuAcik] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -53,9 +57,19 @@ export default function AnaEkran() {
         ListHeaderComponent={
           <>
             <Text style={s.ustYazi}>TARİF ASİSTANI</Text>
-            <Text style={s.baslik}>
-              Bugün ne{'\n'}pişiriyoruz? <Text style={s.baslikEmoji}>🍳</Text>
-            </Text>
+            <View style={s.baslikSatir}>
+              <Text style={s.baslik}>
+                Bugün ne{'\n'}pişiriyoruz? <Text style={s.baslikEmoji}>🍳</Text>
+              </Text>
+              {menu.length > 0 && (
+                <Pressable style={s.menuBtn} onPress={() => setMenuAcik(true)}>
+                  <Text style={s.menuBtnYazi}>🍽️ Menüm</Text>
+                  <View style={s.menuRozet}>
+                    <Text style={s.menuRozetYazi}>{menu.length}</Text>
+                  </View>
+                </Pressable>
+              )}
+            </View>
 
             <Pressable onPress={() => router.push('/malzeme-sec')}>
               {({ pressed }) => (
@@ -106,6 +120,7 @@ export default function AnaEkran() {
           </Pressable>
         }
       />
+      <MenuModal visible={menuAcik} onClose={() => setMenuAcik(false)} />
     </SafeAreaView>
   );
 }
@@ -115,8 +130,39 @@ const s = StyleSheet.create({
   liste: { padding: 20, paddingBottom: 36 },
   sutunlar: { gap: 14 },
   ustYazi: { fontSize: 13, fontWeight: '800', letterSpacing: 3, color: Renk.ana, marginTop: 8 },
-  baslik: { fontSize: 34, fontWeight: '800', color: Renk.yazi, lineHeight: 40, marginTop: 6, marginBottom: 20 },
+  baslikSatir: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginTop: 6,
+    marginBottom: 20,
+    gap: 10,
+  },
+  baslik: { fontSize: 34, fontWeight: '800', color: Renk.yazi, lineHeight: 40, flex: 1 },
   baslikEmoji: { fontSize: 30 },
+  menuBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: Renk.anaSoft,
+    borderWidth: 1,
+    borderColor: Renk.ana,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 6,
+  },
+  menuBtnYazi: { fontSize: 13, fontWeight: '800', color: Renk.ana },
+  menuRozet: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: Renk.ana,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 5,
+  },
+  menuRozetYazi: { fontSize: 12, fontWeight: '900', color: Renk.arka },
   hero: {
     flexDirection: 'row',
     alignItems: 'center',

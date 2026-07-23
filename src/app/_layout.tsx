@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet, View } from 'react-native';
 
 import { Renk } from '@/constants/renkler';
+import { MenuProvider } from '@/context/menu';
 import { initDb } from '@/db/database';
 
 const web = Platform.OS === 'web';
@@ -11,11 +12,12 @@ const web = Platform.OS === 'web';
 export default function RootLayout() {
   return (
     <SQLiteProvider databaseName="tarif-asistani.db" onInit={initDb}>
-      <StatusBar style="light" />
-      {/* Web'de: geniş ekranda ortalanmış telefon genişliği kolon.
-          Telefon/emülatörde: tam genişlik (bu sarmalayıcılar şeffaf geçer). */}
-      <View style={[s.disKap, web && s.disKapWeb]}>
-        <View style={[s.kolon, web && s.kolonWeb]}>
+      <MenuProvider>
+        <StatusBar style="light" />
+        {/* Web'de: geniş ekranda ortalanmış telefon genişliği kolon.
+            Telefon/emülatörde: tam genişlik (bu sarmalayıcılar şeffaf geçer). */}
+        <View style={[s.disKap, web && s.disKapWeb]}>
+          <View style={[s.kolon, web && s.kolonWeb]}>
           <Stack
             screenOptions={{
               headerStyle: { backgroundColor: Renk.arka },
@@ -35,8 +37,9 @@ export default function RootLayout() {
             <Stack.Screen name="admin/malzeme-ekle" options={{ title: 'Malzeme Ekle' }} />
             <Stack.Screen name="admin/tarif-ekle" options={{ title: 'Tarif Ekle' }} />
           </Stack>
+          </View>
         </View>
-      </View>
+      </MenuProvider>
     </SQLiteProvider>
   );
 }
