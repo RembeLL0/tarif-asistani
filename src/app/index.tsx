@@ -63,7 +63,7 @@ export default function AnaEkran() {
               </Text>
               <Pressable
                 style={s.menuBtn}
-                onPress={() => (menu.length > 0 ? setMenuAcik(true) : router.push('/malzeme-sec'))}
+                onPress={() => (menu.length > 0 ? setMenuAcik(true) : router.push('/menu-olustur'))}
               >
                 {menu.length > 0 ? (
                   <>

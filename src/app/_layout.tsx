@@ -31,6 +31,7 @@ export default function RootLayout() {
             <Stack.Screen name="mutfak/[id]" options={{ title: 'Mutfak' }} />
             <Stack.Screen name="tarif/[id]" options={{ title: '', headerTransparent: true, headerTintColor: '#fff' }} />
             <Stack.Screen name="malzeme-sec" options={{ title: 'Evde Ne Var?' }} />
+            <Stack.Screen name="menu-olustur" options={{ title: 'Menü Oluştur' }} />
             <Stack.Screen name="sonuclar" options={{ title: 'Bulunan Tarifler' }} />
             <Stack.Screen name="admin/index" options={{ title: 'Veri Girişi' }} />
             <Stack.Screen name="admin/mutfak-ekle" options={{ title: 'Mutfak Ekle' }} />

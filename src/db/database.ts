@@ -195,6 +195,15 @@ export async function getTarif(db: SQLiteDatabase, id: number): Promise<Tarif | 
   );
 }
 
+// Menü oluştururken elle seçmek için tüm tarifleri döndürür.
+export async function getTumTarifler(db: SQLiteDatabase): Promise<OneriTarif[]> {
+  return db.getAllAsync<OneriTarif>(
+    `SELECT t.id, t.isim, m.isim AS mutfak, t.kategori, t.sure_dk, t.tur
+     FROM tarifler t JOIN mutfaklar m ON m.id = t.mutfak_id
+     ORDER BY t.isim`
+  );
+}
+
 // Tarifi menüdeki kurslardan birine ayırır (çorba, ara sıcak, ana yemek, meze, tatlı, içecek).
 export type KursAnahtar = 'corba' | 'arasicak' | 'ana' | 'meze' | 'tatli' | 'icecek';
 
