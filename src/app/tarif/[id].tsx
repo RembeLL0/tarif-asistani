@@ -1,12 +1,19 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { golge, Gradyan, Renk } from '@/constants/renkler';
-import { getTarif, getTarifMalzemeleri, type Tarif, type TarifMalzemesi } from '@/db/database';
+import {
+  getTarif,
+  getTarifMalzemeleri,
+  getYakisanTarifler,
+  type OneriTarif,
+  type Tarif,
+  type TarifMalzemesi,
+} from '@/db/database';
 import { miktarOlcekle } from '@/db/olcek';
 import { YEREL_RESIM } from '@/db/yerel-resimler';
 
@@ -16,8 +23,10 @@ const MAX_PORSIYON = 5;
 export default function TarifDetay() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const db = useSQLiteContext();
+  const router = useRouter();
   const [tarif, setTarif] = useState<Tarif | null>(null);
   const [malzemeler, setMalzemeler] = useState<TarifMalzemesi[]>([]);
+  const [oneriler, setOneriler] = useState<OneriTarif[]>([]);
   // Kullanıcının seçtiği kişi sayısı. Tarif yüklenince tabanına eşitlenir.
   const [porsiyon, setPorsiyon] = useState<number | null>(null);
 
@@ -25,6 +34,8 @@ export default function TarifDetay() {
     getTarif(db, Number(id)).then((t) => {
       setTarif(t);
       setPorsiyon(t?.porsiyon ?? null);
+      if (t) getYakisanTarifler(db, t, 3).then(setOneriler);
+      else setOneriler([]);
     });
     getTarifMalzemeleri(db, Number(id)).then(setMalzemeler);
   }, [db, id]);
@@ -127,6 +138,46 @@ export default function TarifDetay() {
           </View>
         ))}
       </View>
+
+      {oneriler.length > 0 && (
+        <>
+          <Text style={s.bolumBaslik}>🍽️ Yanında İyi Gider</Text>
+          <Text style={s.oneriGiris}>
+            Sofranı tamamlamak için bu tarifin yanına çok yakışır:
+          </Text>
+          <View style={[s.kart, golge]}>
+            {oneriler.map((o, i) => {
+              const oResim = YEREL_RESIM[o.isim];
+              return (
+                <Pressable
+                  key={o.id}
+                  onPress={() => router.push(`/tarif/${o.id}`)}
+                  style={({ pressed }) => [
+                    s.oneriSatir,
+                    i > 0 && s.ustCizgi,
+                    pressed && s.oneriBasili,
+                  ]}
+                >
+                  {oResim ? (
+                    <Image source={oResim} style={s.oneriResim} contentFit="cover" transition={200} />
+                  ) : (
+                    <View style={[s.oneriResim, s.oneriResimBos]}>
+                      <Text style={{ fontSize: 20 }}>{o.tur === 'kokteyl' ? '🍹' : '🍽️'}</Text>
+                    </View>
+                  )}
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.oneriIsim}>{o.isim}</Text>
+                    <Text style={s.oneriAlt}>
+                      {o.mutfak} · ⏱ {o.sure_dk} dk
+                    </Text>
+                  </View>
+                  <Text style={s.oneriOk}>›</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -200,4 +251,12 @@ const s = StyleSheet.create({
   },
   adimNoYazi: { color: '#fff', fontWeight: '800', fontSize: 13 },
   adimYazi: { flex: 1, fontSize: 15, color: Renk.yazi, lineHeight: 23 },
+  oneriGiris: { fontSize: 14, color: Renk.soluk, marginTop: -4, marginBottom: 12, lineHeight: 20 },
+  oneriSatir: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },
+  oneriBasili: { opacity: 0.7 },
+  oneriResim: { width: 52, height: 52, borderRadius: 14, backgroundColor: Renk.anaSoft },
+  oneriResimBos: { alignItems: 'center', justifyContent: 'center' },
+  oneriIsim: { fontSize: 15, fontWeight: '700', color: Renk.yazi },
+  oneriAlt: { fontSize: 12, color: Renk.soluk, marginTop: 3 },
+  oneriOk: { fontSize: 22, color: Renk.soluk, fontWeight: '700', paddingHorizontal: 4 },
 });

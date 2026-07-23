@@ -195,6 +195,96 @@ export async function getTarif(db: SQLiteDatabase, id: number): Promise<Tarif | 
   );
 }
 
+// Tarifi menüdeki kurslardan birine ayırır (çorba, ara sıcak, ana yemek, meze, tatlı, içecek).
+export type KursAnahtar = 'corba' | 'arasicak' | 'ana' | 'meze' | 'tatli' | 'icecek';
+
+export function kursGrubu(kategori: string, tur: string): KursAnahtar {
+  if (tur === 'kokteyl') return 'icecek';
+  const k = (kategori ?? '').toLocaleLowerCase('tr');
+  if (k.includes('içecek') || k.includes('kokteyl')) return 'icecek';
+  if (k.includes('çorba')) return 'corba';
+  if (k.includes('tatlı')) return 'tatli';
+  if (k.includes('meze') || k.includes('salata') || k.includes('zeytinyağ') || k.includes('kahvalt'))
+    return 'meze';
+  if (k.includes('hamur') || k.includes('börek') || k.includes('poğaça')) return 'arasicak';
+  return 'ana';
+}
+
+// Bir kursun yanına hangi kursların yakıştığı, öncelik sırasıyla.
+const TAMAMLAYICI: Record<KursAnahtar, KursAnahtar[]> = {
+  corba: ['ana', 'meze', 'arasicak', 'tatli', 'icecek'],
+  arasicak: ['ana', 'corba', 'icecek', 'meze', 'tatli'],
+  ana: ['meze', 'corba', 'icecek', 'tatli', 'arasicak'],
+  meze: ['ana', 'icecek', 'corba', 'arasicak', 'tatli'],
+  tatli: ['icecek', 'tatli', 'meze', 'arasicak', 'ana'],
+  icecek: ['tatli', 'meze', 'arasicak', 'ana', 'corba'],
+};
+
+export interface OneriTarif {
+  id: number;
+  isim: string;
+  mutfak: string;
+  kategori: string;
+  sure_dk: number;
+  tur: 'yemek' | 'kokteyl';
+}
+
+// Verilen tarifin yanına yakışacak `adet` kadar öneri döndürür: tamamlayıcı
+// kurslardan çeşitlilikle seçer, aynı mutfağı yeğler, tarif id'sine göre kararlı.
+export async function getYakisanTarifler(
+  db: SQLiteDatabase,
+  tarif: Tarif,
+  adet = 3
+): Promise<OneriTarif[]> {
+  const hepsi = await db.getAllAsync<OneriTarif>(
+    `SELECT t.id, t.isim, m.isim AS mutfak, t.kategori, t.sure_dk, t.tur
+     FROM tarifler t JOIN mutfaklar m ON m.id = t.mutfak_id
+     WHERE t.id != ?`,
+    tarif.id
+  );
+  if (hepsi.length === 0) return [];
+
+  const oncelik = TAMAMLAYICI[kursGrubu(tarif.kategori, tarif.tur)];
+  const secilen: OneriTarif[] = [];
+  const kullanilan = new Set<number>();
+
+  // Aynı mutfağı olanı, yoksa herhangi birini; tarif id'sine göre kararlı seç.
+  const grubtanSec = (g: KursAnahtar): OneriTarif | null => {
+    const adaylar = hepsi.filter(
+      (a) => !kullanilan.has(a.id) && kursGrubu(a.kategori, a.tur) === g
+    );
+    if (adaylar.length === 0) return null;
+    const ayniMutfak = adaylar.filter((a) => a.mutfak === tarif.mutfak);
+    const havuz = ayniMutfak.length > 0 ? ayniMutfak : adaylar;
+    return havuz[(tarif.id + secilen.length) % havuz.length];
+  };
+
+  // 1. tur: öncelik sırasındaki her gruptan birer tane (çeşitlilik için).
+  for (const g of oncelik) {
+    if (secilen.length >= adet) break;
+    const sec = grubtanSec(g);
+    if (sec) {
+      secilen.push(sec);
+      kullanilan.add(sec.id);
+    }
+  }
+  // 2. tur: hâlâ eksikse aynı grupları ikinci kez tara.
+  while (secilen.length < adet) {
+    let eklendi = false;
+    for (const g of oncelik) {
+      if (secilen.length >= adet) break;
+      const sec = grubtanSec(g);
+      if (sec) {
+        secilen.push(sec);
+        kullanilan.add(sec.id);
+        eklendi = true;
+      }
+    }
+    if (!eklendi) break;
+  }
+  return secilen.slice(0, adet);
+}
+
 export async function getTarifMalzemeleri(db: SQLiteDatabase, tarifId: number): Promise<TarifMalzemesi[]> {
   return db.getAllAsync<TarifMalzemesi>(
     `SELECT m.id, m.isim, m.kategori, tm.miktar FROM tarif_malzeme tm
