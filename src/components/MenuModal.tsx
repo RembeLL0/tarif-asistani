@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -19,7 +19,9 @@ const KURS_SIRA: { anahtar: KursAnahtar; etiket: string }[] = [
 
 export function MenuModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { menu, cikar, temizle } = useMenu();
+  const menuOlusturEkraninda = pathname === '/menu-olustur';
 
   // Menü tamamen boşalınca (son tarif çıkarılınca) pencereyi kapat.
   useEffect(() => {
@@ -49,6 +51,18 @@ export function MenuModal({ visible, onClose }: { visible: boolean; onClose: () 
           <Text style={s.ozet}>
             {menu.length} tarif · toplam ⏱ {toplamSure} dk
           </Text>
+
+          {!menuOlusturEkraninda && (
+            <Pressable
+              style={s.ekleBtn}
+              onPress={() => {
+                onClose();
+                router.push('/menu-olustur');
+              }}
+            >
+              <Text style={s.ekleBtnYazi}>＋ Menüye tarif ekle</Text>
+            </Pressable>
+          )}
 
           <ScrollView style={s.liste} contentContainerStyle={{ gap: 16 }}>
             {gruplar.map((g) => (
@@ -121,7 +135,17 @@ const s = StyleSheet.create({
   ust: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   baslik: { fontSize: 20, fontWeight: '900', color: Renk.yazi },
   kapat: { fontSize: 20, color: Renk.soluk, fontWeight: '700' },
-  ozet: { fontSize: 13, color: Renk.soluk, marginTop: 4, marginBottom: 14 },
+  ozet: { fontSize: 13, color: Renk.soluk, marginTop: 4, marginBottom: 12 },
+  ekleBtn: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Renk.ana,
+    backgroundColor: Renk.anaSoft,
+    marginBottom: 14,
+  },
+  ekleBtnYazi: { fontSize: 14, fontWeight: '800', color: Renk.ana },
   liste: { flexGrow: 0 },
   kursBaslik: {
     fontSize: 12,
